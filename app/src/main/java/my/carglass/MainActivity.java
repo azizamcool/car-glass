@@ -42,6 +42,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class MainActivity extends Activity implements LocationListener {
     // Home-screen tiles, used until the user changes them (package, label).
     private static final String[] DEFAULT_TILES = {
             "com.imotor.fmam", "com.google.android.youtube", "com.google.android.apps.youtube.music",
-            "com.google.android.apps.maps", "com.imotor.btmusic", "com.netflix.mediaclient",
+            "com.pintaz.customer", "com.imotor.btmusic", "com.imotor.phoneconnect",
     };
     private static final Map<String, String> LABELS = new HashMap<>();
     // Shown first inside "Semua apps".
@@ -80,12 +81,14 @@ public class MainActivity extends Activity implements LocationListener {
         LABELS.put("com.imotor.video", "Video");
         LABELS.put("com.imotor.navigation", "Navigasi");
         LABELS.put("com.imotor.phoneconnect", "Carlink");
+        LABELS.put("com.pintaz.customer", "Pintaz");
         LABELS.put("com.imotor.avin", "AV IN");
         LABELS.put("com.imotor.aux", "AUX");
     }
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private SharedPreferences prefs;
+    private GpsLog gpsLog;
     private float cq;
 
     private FrameLayout root, contentHolder, drawer;
@@ -160,6 +163,7 @@ public class MainActivity extends Activity implements LocationListener {
         DisplayMetrics dm = getResources().getDisplayMetrics();
         cq = Math.max(dm.widthPixels, dm.heightPixels) / 100f;
         prefs = getSharedPreferences("cg", MODE_PRIVATE);
+        gpsLog = new GpsLog(this);
         lat = Double.longBitsToDouble(prefs.getLong("lat", Double.doubleToLongBits(DEFAULT_LAT)));
         lng = Double.longBitsToDouble(prefs.getLong("lng", Double.doubleToLongBits(DEFAULT_LNG)));
         hasFix = prefs.contains("lat");
@@ -490,7 +494,8 @@ public class MainActivity extends Activity implements LocationListener {
         String label;
         if (launch != null) {
             try {
-                iv.setImageDrawable(pm.getApplicationIcon(pkg));
+                // The launcher activity's icon is what the app shows elsewhere (the app-level one can be generic).
+                iv.setImageDrawable(pm.getActivityIcon(launch));
             } catch (PackageManager.NameNotFoundException ignored) {
             }
             label = labelFor(pkg);
@@ -558,6 +563,14 @@ public class MainActivity extends Activity implements LocationListener {
         drawerTitle = text(2.2f, fg(), 600);
         drawerTitle.setText("Semua aplikasi");
         head.addView(drawerTitle, lp(0, -2, 1f));
+        TextView update = text(1.6f, light ? Color.WHITE : 0xFF04121C, 700);
+        update.setText("Kemaskini apps");
+        update.setPadding(px(2f), px(.8f), px(2f), px(.8f));
+        update.setBackground(glass(true, 2f));
+        update.setOnClickListener(v -> openUpdates());
+        LinearLayout.LayoutParams ul = lp(-2, -2, 0);
+        ul.rightMargin = px(1.2f);
+        head.addView(update, ul);
         TextView close = text(1.6f, fg(), 500);
         close.setText("Tutup");
         close.setPadding(px(2f), px(.8f), px(2f), px(.8f));
@@ -638,6 +651,22 @@ public class MainActivity extends Activity implements LocationListener {
         lp.setMargins(px(.4f), px(.4f), px(.4f), px(.4f));
         c.setLayoutParams(lp);
         return c;
+    }
+
+    /**
+     * One tap to Play Store. Auto-update is switched off to keep the unit light, so updates are done by hand
+     * from here. Play Store has no public link straight to "Manage apps", so a hint says where "Update all" is.
+     */
+    private void openUpdates() {
+        closeDrawer();
+        Intent open = getPackageManager().getLaunchIntentForPackage("com.android.vending");
+        if (open == null) {
+            Toast.makeText(this, "Play Store tiada", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        launchApp(open);
+        Toast.makeText(this, "Ketik gambar akaun  ›  Urus apps & peranti  ›  Kemas kini semua",
+                Toast.LENGTH_LONG).show();
     }
 
     private void openDrawer(int forIndex) {
@@ -936,6 +965,7 @@ public class MainActivity extends Activity implements LocationListener {
 
     @Override
     public void onLocationChanged(Location l) {
+        gpsLog.record(l, satUsed);
         lastSpeed = l.hasSpeed() ? l.getSpeed() * 3.6f : 0f;
         speedo.setSpeed(lastSpeed);
         if (lastFix != null && lastSpeed > 3f) tripMeters += lastFix.distanceTo(l);
@@ -956,6 +986,13 @@ public class MainActivity extends Activity implements LocationListener {
         if (i.getBooleanExtra("splash", false)) splash.play(null);
         if (i.hasExtra("rain")) raining = i.getBooleanExtra("rain", false);
         if (i.hasExtra("day")) dayOverride = i.getFloatExtra("day", -1f);
+        if (i.getBooleanExtra("gpslogtest", false)) {
+            Location fake = new Location("gps");
+            fake.setSpeed(16.7f);
+            fake.setAccuracy(5f);
+            fake.setElapsedRealtimeNanos(android.os.SystemClock.elapsedRealtimeNanos() - 80_000_000L);
+            gpsLog.record(fake, 7);
+        }
         if (i.hasExtra("speed")) {
             lastSpeed = i.getFloatExtra("speed", 0f);
             speedo.setSpeedImmediate(lastSpeed);

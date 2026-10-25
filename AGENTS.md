@@ -52,6 +52,28 @@ landskap, tiada GPS, atau unit tak benarkan pasang APK. Tanya sebelum teruskan.
   **Jangan buang launcher asal.**
 - Ingatkan pengguna menguji: stereng, kamera belakang, radio, Bluetooth, Carlink. Anda tak boleh mengesahkan ini.
 
+### Fasa 6: Optimum (semak RAM dan prestasi, hanya jika pengguna mahu)
+Tujuannya: unit tidak tersekat. **Semak dahulu, cadang, tunggu persetujuan, baru ubah.**
+
+1. Jalankan `tools/ram-audit.ps1 -Device ...` (hanya membaca). Terangkan hasilnya dengan mudah:
+   - *Free RAM* sudah termasuk cache; cache besar itu normal. Jangan panik melihat "RAM hampir penuh".
+   - Cari proses paling berat dan app yang hidup tapi jarang digunakan.
+   - **Play Store dengan 2 proses atau lebih** biasanya bermaksud kemas kini automatik sedang berjalan.
+2. Cadangan, dari yang paling selamat:
+   - Matikan kemas kini automatik Play Store (pengguna: *Play Store, akaun, Settings, Network preferences,
+     Auto-update apps, Don't auto-update*). Kemas kini dibuat secara manual semasa kereta berhenti.
+   - Skala animasi sistem 0.5 (`settings put global window_animation_scale 0.5` dan dua yang serupa).
+   - Senaraikan app yang digunakan kurang daripada kira-kira 1 minit sebulan (pasang sendiri oleh pengguna).
+3. **Tanya pengguna untuk setiap app sebelum dibuang. Jangan buang terus.** Tunjuk bukti (masa penggunaan, RAM).
+   Gunakan `pm uninstall -k --user 0 <pakej>` hanya selepas persetujuan, dan catat cara memulihkannya:
+   app sistem `cmd package install-existing <pakej>`; app Play Store dipasang semula daripada Play Store.
+4. Jangan sentuh pakej pengeluar atau Google Play Services/Store.
+5. Untuk kelewatan GPS: Car Glass merekod `gps-log.csv` (masa sahaja, tanpa koordinat) di
+   `/sdcard/Android/data/my.carglass/files/`. Selepas pengguna memandu, tarik fail itu (`adb pull`) dan baca
+   `age_ms` (umur bacaan semasa tiba) dan `interval_ms` (jarak antara bacaan). Selang sekitar 1000 ms bermaksud
+   cip GPS melaporkan 1 Hz; `age_ms` yang besar bermaksud bacaan sampai lewat.
+6. Kemas kini Android/firmware: hanya daripada pembekal. Beritahu pengguna, jangan flash sendiri.
+
 ### Penutup
 Beri pengguna: cara kembali ke Home asal (`tools/revert.ps1`), cara tukar enam app, dan apa yang telah diubah.
 

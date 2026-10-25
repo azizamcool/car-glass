@@ -22,6 +22,10 @@ Experimental, tested on a single Mohawk RK3326 unit (Android 11).
 - **Enam app** di skrin utama. **Tahan lama** untuk tukar; **Semua apps** untuk senarai penuh. Ikon diambil terus daripada app.
 - **Siang / malam** dengan pudar sekitar Syuruk dan Maghrib; **hujan** bila cuaca menunjukkan hujan.
 - **Splash** pendek (sekitar 1.3 saat) bila app dimulakan atau unit bangun.
+- **Butang "Kemaskini apps"** dalam senarai Semua apps: satu ketik ke Play Store untuk kemas kini manual
+  (kemas kini automatik sebaiknya dimatikan supaya unit tidak tersekat; lihat Fasa 6 dalam [AGENTS.md](AGENTS.md)).
+- **Audit RAM:** `tools\ram-audit.ps1` menunjukkan proses berat dan app yang jarang digunakan (hanya membaca).
+- **Log GPS** (`gps-log.csv`, masa dan kelajuan sahaja, tanpa koordinat) untuk mencari punca kelewatan GPS.
 
 ## Apa yang diperlukan
 

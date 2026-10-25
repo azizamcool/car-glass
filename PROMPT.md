@@ -17,6 +17,10 @@ Sebelum memulakan:
    beri IP:port, dan kod pairing jika diminta).
 3. Jalankan `tools/preflight.ps1`, laporkan keputusan, dan tanya saya sama ada mahu teruskan.
 
+Selepas Car Glass berjalan, tanya saya sama ada mahu **semak prestasi dan RAM** (Fasa 6 dalam `AGENTS.md`):
+jalankan `tools/ram-audit.ps1`, terangkan hasilnya dengan bahasa mudah, dan cadangkan cara mengoptimumkan.
+**Tanya saya dahulu untuk setiap app sebelum membuang atau mematikannya. Jangan buang terus.**
+
 Peraturan penting (ringkasan, lihat `AGENTS.md`):
 - Jangan sentuh MCU, CAN bus, kamera belakang, kawalan stereng, Bluetooth, radio atau bootlogo.
 - Jangan cuba memintas kata laluan Developer options atau Factory mode. Kalau terkunci, berhenti dan beritahu saya.
