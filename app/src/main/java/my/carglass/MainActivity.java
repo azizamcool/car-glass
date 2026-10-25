@@ -88,6 +88,7 @@ public class MainActivity extends Activity implements LocationListener {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private SharedPreferences prefs;
+    private final List<View> glassViews = new ArrayList<>();
     private GpsLog gpsLog;
     private float cq;
 
@@ -177,6 +178,7 @@ public class MainActivity extends Activity implements LocationListener {
 
         root = new FrameLayout(this);
         bg = new BackgroundView(this);
+        bg.setOnChange(this::repaintGlass);
         root.addView(bg);
         rainView = new RainView(this);
         rainView.setVisibility(raining ? View.VISIBLE : View.GONE);
@@ -271,16 +273,19 @@ public class MainActivity extends Activity implements LocationListener {
         return s;
     }
 
-    private Drawable cell(boolean on) {
-        GradientDrawable d = new GradientDrawable();
-        d.setColor(on ? (light ? 0xEBFFFFFF : 0x29FFFFFF) : (light ? 0xBDFFFFFF : 0x12FFFFFF));
-        d.setStroke(Math.max(1, px(.1f)), on ? accent() : (light ? 0xE6FFFFFF : 0x1FFFFFFF));
-        d.setCornerRadius(px(1.1f));
-        return d;
+    /** Frosted-glass background for a view; the view is remembered so it repaints when the scene behind it changes. */
+    private Drawable glassBg(View v, float radiusCq, boolean highlight, boolean circle) {
+        if (!glassViews.contains(v)) glassViews.add(v);
+        return new GlassDrawable(bg, v, px(radiusCq), circle, light, highlight, accent());
+    }
+
+    private void repaintGlass() {
+        for (View v : glassViews) v.invalidate();
     }
 
     private void rebuild() {
         speedoReset();
+        glassViews.clear();
         contentHolder.removeAllViews();
         contentHolder.addView(buildContent(), new FrameLayout.LayoutParams(-1, -1));
         buildDrawer();
@@ -306,14 +311,14 @@ public class MainActivity extends Activity implements LocationListener {
         LinearLayout wx = new LinearLayout(this);
         wx.setOrientation(LinearLayout.VERTICAL);
         wx.setGravity(Gravity.CENTER_HORIZONTAL);
-        locTv = text(1.6f, fgSoft(), 500);
+        locTv = text(1.9f, fgSoft(), 500);
         locTv.setGravity(Gravity.CENTER);
         wx.addView(locTv);
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        wxIconTv = text(2.6f, fg(), 400);
-        wxTempTv = text(2.6f, fg(), 300);
-        wxCondTv = text(1.7f, fgSoft(), 500);
+        wxIconTv = text(2.8f, fg(), 400);
+        wxTempTv = text(3.0f, fg(), 300);
+        wxCondTv = text(2.0f, fgSoft(), 500);
         row.addView(wxIconTv);
         LinearLayout.LayoutParams tl = lp(-2, -2, 0);
         tl.setMargins(px(1f), 0, px(1f), 0);
@@ -330,6 +335,7 @@ public class MainActivity extends Activity implements LocationListener {
         left.addView(wx);
         speedo = new SpeedometerView(this);
         speedo.setTheme(light, accent());
+        if (light) speedo.setBackground(glassBg(speedo, 0f, false, true));
         LinearLayout.LayoutParams sl = lp(px(30.5f), px(30.5f), 0);
         sl.topMargin = px(.8f);
         left.addView(speedo, sl);
@@ -347,8 +353,8 @@ public class MainActivity extends Activity implements LocationListener {
         clockCol.setOrientation(LinearLayout.VERTICAL);
         LinearLayout clockRow = new LinearLayout(this);
         clockRow.setBaselineAligned(true);
-        clockTv = text(6.3f, fg(), 700);
-        ampmTv = text(1.9f, accent(), 700);
+        clockTv = text(5.9f, fg(), 700);
+        ampmTv = text(1.8f, accent(), 700);
         ampmTv.setLetterSpacing(.06f);
         ampmTv.setSingleLine(true);
         ampmTv.setMinWidth(px(3.6f));
@@ -361,7 +367,7 @@ public class MainActivity extends Activity implements LocationListener {
         LinearLayout.LayoutParams dl = lp(-2, -2, 0);
         dl.topMargin = px(.5f);
         clockCol.addView(dateTv, dl);
-        clockCol.setMinimumWidth(px(18f));
+        clockCol.setMinimumWidth(px(17.2f));
         top.addView(clockCol, lp(-2, -2, 0));
 
         LinearLayout rightTop = new LinearLayout(this);
@@ -388,10 +394,10 @@ public class MainActivity extends Activity implements LocationListener {
             cell.setOrientation(LinearLayout.VERTICAL);
             cell.setGravity(Gravity.CENTER);
             cell.setPadding(0, px(.7f), 0, px(.7f));
-            prayerName[i] = text(1.15f, fgSoft(), 500);
+            prayerName[i] = text(1.3f, fgSoft(), 500);
             prayerName[i].setText(PrayerTimes.NAMES[i]);
             prayerName[i].setGravity(Gravity.CENTER);
-            prayerTime[i] = text(1.7f, fg(), 600);
+            prayerTime[i] = text(2.0f, fg(), 600);
             prayerTime[i].setGravity(Gravity.CENTER);
             cell.addView(prayerName[i]);
             LinearLayout.LayoutParams tp = lp(-2, -2, 0);
@@ -406,7 +412,7 @@ public class MainActivity extends Activity implements LocationListener {
         prl.topMargin = px(1.6f);
         right.addView(prayerRow, prl);
 
-        nextLineTv = text(1.2f, fgSoft(), 500);
+        nextLineTv = text(1.4f, fgSoft(), 500);
         nextLineTv.setPadding(0, px(.6f), 0, 0);
         right.addView(nextLineTv);
 
@@ -447,18 +453,14 @@ public class MainActivity extends Activity implements LocationListener {
         LinearLayout c = new LinearLayout(this);
         c.setGravity(Gravity.CENTER_VERTICAL);
         c.setPadding(px(.8f), px(.5f), px(1.1f), px(.5f));
-        GradientDrawable d = new GradientDrawable();
-        d.setColor(light ? 0xB3FFFFFF : 0x1AFFFFFF);
-        d.setStroke(Math.max(1, px(.1f)), light ? 0xF2FFFFFF : 0x33FFFFFF);
-        d.setCornerRadius(px(2f));
-        c.setBackground(d);
+        c.setBackground(glassBg(c, 2f, false, false));
         ImageView iv = new ImageView(this);
         iv.setImageResource(iconRes);
         c.addView(iv, new LinearLayout.LayoutParams(px(1.7f), px(1.7f)));
-        TextView tv = text(1.25f, fg(), 500);
+        TextView tv = text(1.3f, fg(), 500);
         tv.setSingleLine(true);
         tv.setEllipsize(TextUtils.TruncateAt.END);
-        tv.setMaxWidth(px(idx == 0 ? 11f : idx == 1 ? 10f : 14f));
+        tv.setMaxWidth(px(idx == 0 ? 9.5f : idx == 1 ? 9f : 11f));
         LinearLayout.LayoutParams tl = lp(-2, -2, 0);
         tl.leftMargin = px(.6f);
         c.addView(tv, tl);
@@ -488,24 +490,20 @@ public class MainActivity extends Activity implements LocationListener {
         LinearLayout t = new LinearLayout(this);
         t.setOrientation(LinearLayout.VERTICAL);
         t.setGravity(Gravity.CENTER);
-        t.setBackground(glass(false, 2.2f));
+        t.setBackground(glassBg(t, 2.2f, false, false));
         t.setClickable(true);
         ImageView iv = new ImageView(this);
         String label;
         if (launch != null) {
-            try {
-                // The launcher activity's icon is what the app shows elsewhere (the app-level one can be generic).
-                iv.setImageDrawable(pm.getActivityIcon(launch));
-            } catch (PackageManager.NameNotFoundException ignored) {
-            }
+            iv.setImageDrawable(Icons.forApp(this, pkg, launch));
             label = labelFor(pkg);
         } else {
             label = "Pilih app";
             iv.setImageResource(android.R.drawable.ic_menu_add);
             iv.setColorFilter(fgSoft(), PorterDuff.Mode.SRC_IN);
         }
-        t.addView(iv, new LinearLayout.LayoutParams(px(6f), px(6f)));
-        TextView tv = text(1.9f, fg(), 600);
+        t.addView(iv, new LinearLayout.LayoutParams(px(5.4f), px(5.4f)));
+        TextView tv = text(2.15f, fg(), 600);
         tv.setGravity(Gravity.CENTER);
         tv.setSingleLine(true);
         tv.setText(label);
@@ -545,7 +543,7 @@ public class MainActivity extends Activity implements LocationListener {
 
     private static class AppItem {
         String pkg, label;
-        Drawable icon;
+        Drawable icon, modernIcon;
         Intent intent;
     }
 
@@ -605,6 +603,7 @@ public class MainActivity extends Activity implements LocationListener {
             a.icon = ri.loadIcon(pm);
             a.intent = pm.getLaunchIntentForPackage(pkg);
             if (a.intent == null) continue;
+            a.modernIcon = Icons.forApp(this, pkg, a.intent);
             int idx = -1;
             for (int i = 0; i < PINNED.length; i++) if (PINNED[i].equals(pkg)) idx = i;
             if (idx >= 0) {
@@ -625,7 +624,7 @@ public class MainActivity extends Activity implements LocationListener {
         c.setBackground(glass(false, 1.6f));
         c.setClickable(true);
         ImageView iv = new ImageView(this);
-        iv.setImageDrawable(a.icon);
+        iv.setImageDrawable(a.modernIcon != null ? a.modernIcon : a.icon);
         c.addView(iv, new LinearLayout.LayoutParams(px(5f), px(5f)));
         TextView tv = text(1.4f, fg(), 500);
         tv.setGravity(Gravity.CENTER);
@@ -766,7 +765,7 @@ public class MainActivity extends Activity implements LocationListener {
         for (int i = 0; i < 6; i++) {
             prayerTime[i].setText(fmt(times[i]));
             boolean on = i == nextPrayer || (nextPrayer < 0 && i == 0);
-            prayerCell[i].setBackground(cell(on));
+            prayerCell[i].setBackground(glassBg(prayerCell[i], 1.1f, on, false));
             prayerName[i].setTextColor(on ? accent() : fgSoft());
             prayerTime[i].setTextColor(on ? accent() : fg());
         }

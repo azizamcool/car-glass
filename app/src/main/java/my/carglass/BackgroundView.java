@@ -1,6 +1,7 @@
 package my.carglass;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
@@ -27,19 +28,59 @@ public class BackgroundView extends View {
     public void setRain(boolean r) {
         if (rain == r) return;
         rain = r;
-        invalidate();
+        changed();
     }
 
     public void setDayFactor(float f) {
         f = Math.max(0f, Math.min(1f, f));
         if (Math.abs(f - day) < .004f) return;
         day = f;
+        changed();
+    }
+
+    private Bitmap blurred;
+    private boolean blurDirty = true;
+    private Runnable onChange;
+
+    /** Called whenever the picture changes, so glass views can repaint their slice. */
+    public void setOnChange(Runnable r) {
+        onChange = r;
+    }
+
+    private void changed() {
+        blurDirty = true;
         invalidate();
+        if (onChange != null) onChange.run();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int ow, int oh) {
+        blurDirty = true;
+    }
+
+    /** A heavily downscaled copy of the whole scene: drawn stretched behind glass it reads as frosted. */
+    public Bitmap getBlurred() {
+        if (blurDirty || blurred == null) {
+            int w = getWidth(), h = getHeight();
+            if (w == 0 || h == 0) return blurred;
+            Bitmap mid = Bitmap.createBitmap(Math.max(1, w / 8), Math.max(1, h / 8), Bitmap.Config.ARGB_8888);
+            Canvas mc = new Canvas(mid);
+            mc.scale(mid.getWidth() / (float) w, mid.getHeight() / (float) h);
+            paintAll(mc, w, h);
+            Bitmap tiny = Bitmap.createScaledBitmap(mid, Math.max(2, w / 36), Math.max(2, h / 36), true);
+            mid.recycle();
+            blurred = tiny;
+            blurDirty = false;
+        }
+        return blurred;
     }
 
     @Override
     protected void onDraw(Canvas c) {
-        float w = getWidth(), h = getHeight();
+        paintAll(c, getWidth(), getHeight());
+    }
+
+    private void paintAll(Canvas c, float w, float h) {
         drawNight(c, w, h);
         if (day > 0f) {
             int save = c.saveLayerAlpha(0, 0, w, h, Math.round(day * 255));

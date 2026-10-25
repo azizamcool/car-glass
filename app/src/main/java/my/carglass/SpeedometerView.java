@@ -49,12 +49,6 @@ public class SpeedometerView extends View {
         float k = s / 400f, cx = getWidth() / 2f, cy = getHeight() / 2f;
         int fg = light ? 0xFF0D1B2E : 0xFFFFFFFF;
 
-        if (light) {
-            p.setStyle(Paint.Style.FILL);
-            p.setColor(0x8CFFFFFF);
-            c.drawCircle(cx, cy, s / 2f, p);
-        }
-
         p.setStyle(Paint.Style.STROKE);
         p.setStrokeWidth(1.5f * k);
         p.setColor((accent & 0x00FFFFFF) | 0x4D000000);

@@ -20,6 +20,7 @@ Experimental, tested on a single Mohawk RK3326 unit (Android 11).
 - **Cuaca dan nama tempat** melalui Open-Meteo dan OpenStreetMap, dikemas kini setiap 30 minit bila ada internet.
 - **Penanda status:** nama Wi-Fi, Bluetooth, GPS (jumlah satelit). Tekan untuk buka tetapan.
 - **Enam app** di skrin utama. **Tahan lama** untuk tukar; **Semua apps** untuk senarai penuh. Ikon diambil terus daripada app.
+- **Kaca berkabur** (kabur dibuat daripada latar kerana Android 11 tiada kabur langsung) dan ikon tanpa petak latar.
 - **Siang / malam** dengan pudar sekitar Syuruk dan Maghrib; **hujan** bila cuaca menunjukkan hujan.
 - **Splash** pendek (sekitar 1.3 saat) bila app dimulakan atau unit bangun.
 - **Butang "Kemaskini apps"** dalam senarai Semua apps: satu ketik ke Play Store untuk kemas kini manual
@@ -85,6 +86,7 @@ Keperluan: JDK 17 dan Android SDK (platform 34, build-tools 34). Lihat [docs/DEV
 
 - Kod: MIT (lihat [LICENSE](LICENSE)). Nama dan logo NEXUP dalam splash ialah jenama pemilik dan tidak termasuk dalam lesen.
 - Font **Exo 2**: SIL Open Font License 1.1 ([licenses/OFL-Exo2.txt](licenses/OFL-Exo2.txt)).
+- Ikon duotone Radio, Bluetooth, Muzik, Navigasi, Video, Carlink, Fail, Galeri dan Tetapan: [Phosphor Icons](https://phosphoricons.com), MIT ([licenses/PHOSPHOR-LICENSE.txt](licenses/PHOSPHOR-LICENSE.txt)).
 - Cuaca: [Open-Meteo](https://open-meteo.com) (penggunaan bukan komersial, dengan atribusi).
 - Nama tempat dan data peta: © pengeluar sumbangan [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL), melalui Nominatim.
 - Konsep repo yang boleh dipasang oleh pembantu AI diilhamkan oleh [Glass TV](https://github.com/cocombee/glass-tv). Tiada kod disalin.

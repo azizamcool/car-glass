@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Car Glass - Reka Bentuk</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/duotone/style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,200;0,300;0,500;0,600;0,700;0,800;1,700;1,800&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;600;800&family=Saira:ital,wght@0,200;0,300;0,500;0,700;1,700;1,800&display=swap" rel="stylesheet">
 <style>
@@ -161,6 +162,77 @@
   .clock { font-weight:700!important; letter-spacing:-.01em; white-space:nowrap; }
   .clock .ampm { font-size:.3em; font-weight:700; letter-spacing:.06em; margin-left:.28em; color:var(--acc); }
   .screen[data-mode="siang"] .clock .ampm { color:#0277bd; }
+  /* ===== v4: kaca sebenar (lutsinar + kabur + kilatan tepi) ===== */
+  .tile:not(.all), .pt, .chip {
+    background:linear-gradient(135deg, rgba(255,255,255,.17), rgba(255,255,255,.05));
+    border:1px solid rgba(255,255,255,.22);
+    -webkit-backdrop-filter:blur(20px) saturate(1.5); backdrop-filter:blur(20px) saturate(1.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.30), inset 0 -1px 0 rgba(255,255,255,.05), 0 12px 30px -16px rgba(0,0,0,.65);
+  }
+  .screen[data-mode="siang"] .tile:not(.all), .screen[data-mode="siang"] .pt, .screen[data-mode="siang"] .chip {
+    background:linear-gradient(135deg, rgba(255,255,255,.40), rgba(255,255,255,.12));
+    border:1px solid rgba(255,255,255,.75);
+    -webkit-backdrop-filter:blur(22px) saturate(1.8); backdrop-filter:blur(22px) saturate(1.8);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(255,255,255,.3), 0 16px 36px -18px rgba(8,40,100,.5);
+  }
+  .screen[data-mode="siang"] .pt.next { background:linear-gradient(135deg, rgba(255,255,255,.72), rgba(255,255,255,.28)); border-color:#2b90d9; }
+  .screen[data-mode="siang"] .gauge {
+    background:radial-gradient(circle at 30% 22%, rgba(255,255,255,.55), rgba(255,255,255,.14) 72%);
+    border:1px solid rgba(255,255,255,.75); -webkit-backdrop-filter:blur(18px) saturate(1.6); backdrop-filter:blur(18px) saturate(1.6);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9), 0 18px 40px -20px rgba(8,40,100,.5);
+  }
+  /* ikon: plat kaca kecil, simbol di tengah (tiada petak putih/kelabu) */
+  .ico { color:#fff; }
+  .screen[data-mode="siang"] .ico { color:#0d1b2e; }
+  .grid.big .ico, .drawer .ico {
+    background:linear-gradient(150deg, rgba(255,255,255,.30), rgba(255,255,255,.06))!important;
+    border:1px solid rgba(255,255,255,.35); box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 8px 16px -8px rgba(0,0,0,.55);
+    overflow:visible!important;
+  }
+  .screen[data-mode="siang"] .grid.big .ico, .screen[data-mode="siang"] .drawer .ico {
+    background:linear-gradient(150deg, rgba(255,255,255,.80), rgba(255,255,255,.28))!important;
+    border:1px solid rgba(255,255,255,.9); box-shadow:inset 0 1px 0 #fff, 0 10px 18px -10px rgba(8,40,100,.55);
+  }
+  .grid.big .ico > svg { width:68%; height:68%; filter:drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
+  .grid.big .ico > div { transform:scale(.9); }
+  /* ===== v5: simbol besar terapung di atas kaca, tanpa plat kedua ===== */
+  .grid.big .ico, .screen[data-mode="siang"] .grid.big .ico {
+    background:none!important; border:none!important; box-shadow:none!important;
+    width:7.8cqw!important; height:7.8cqw!important;
+  }
+  .grid.big .ico > svg { width:100%!important; height:100%!important; filter:drop-shadow(0 .35cqw .5cqw rgba(0,0,0,.4)); }
+  .screen[data-mode="siang"] .grid.big .ico > svg { filter:drop-shadow(0 .35cqw .5cqw rgba(8,40,100,.35)); }
+  .grid.big .tile { gap:.4cqw!important; }
+  .ico i { font-size:7.2cqw; line-height:1; display:block; filter:drop-shadow(0 .35cqw .6cqw rgba(0,0,0,.35)); }
+  /* ===== v6: lebih lutsinar, tema siang ikut tema, teks dan ikon sedikit lebih besar ===== */
+  .tile:not(.all), .pt, .chip {
+    background:linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.18);
+    -webkit-backdrop-filter:blur(26px) saturate(1.6); backdrop-filter:blur(26px) saturate(1.6);
+  }
+  .screen[data-mode="siang"] .tile:not(.all), .screen[data-mode="siang"] .pt, .screen[data-mode="siang"] .chip {
+    background:linear-gradient(135deg, rgba(255,255,255,.26), rgba(255,255,255,.06));
+    border:1px solid rgba(255,255,255,.62);
+    -webkit-backdrop-filter:blur(28px) saturate(1.9); backdrop-filter:blur(28px) saturate(1.9);
+  }
+  .screen[data-mode="siang"] .pt.next { background:linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,.18)); }
+  .screen[data-mode="siang"] .gauge { background:radial-gradient(circle at 30% 22%, rgba(255,255,255,.40), rgba(255,255,255,.08) 72%); }
+  /* tema juga mengubah siang */
+  body[data-theme="sport"] #ld { filter:hue-rotate(165deg) saturate(1.15); }
+  body[data-theme="hijau"] #ld { filter:hue-rotate(-62deg) saturate(1.05); }
+  body[data-theme="sport"] .screen[data-mode="siang"] { --acc:#c62828; }
+  body[data-theme="hijau"] .screen[data-mode="siang"] { --acc:#00796b; }
+  body[data-theme="sport"] .screen[data-mode="siang"] .allpill, body[data-theme="sport"] .screen[data-mode="siang"] .tile.all { background:#c62828; }
+  body[data-theme="hijau"] .screen[data-mode="siang"] .allpill, body[data-theme="hijau"] .screen[data-mode="siang"] .tile.all { background:#00796b; }
+  /* saiz */
+  .grid.big .tile { font-size:2.15cqw!important; }
+  .ico i { font-size:7.8cqw; }
+  .pt { font-size:1.3cqw; } .pt b { font-size:2cqw; }
+  .next-line { font-size:1.4cqw; }
+  .wxbox .loc { font-size:1.9cqw; } .wxbox .wxv { font-size:2cqw; } .wxbox .wxv b { font-size:3cqw; }
+  .chip { font-size:1.45cqw; }
+  .drawer .ico i { font-size:4.6cqw; }
+  .screen[data-mode="siang"] .ico i { filter:drop-shadow(0 .35cqw .6cqw rgba(8,40,100,.3)); }
 </style>
 </head>
 <body data-theme="biru">
@@ -238,6 +310,12 @@ const svgBT='<svg viewBox="0 0 48 48" width="100%" height="100%"><path d="M17 17
 const svgCar='<svg viewBox="0 0 48 48" width="100%" height="100%"><rect x="15.5" y="8" width="17" height="32" rx="3.5" fill="none" stroke="#fff" stroke-width="2.8"/><circle cx="24" cy="35" r="1.8" fill="#fff"/><path d="M20 16h8" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>';
 const svgChrome='<div style="width:66%;height:66%;border-radius:50%;background:conic-gradient(from 30deg,#ea4335 0 120deg,#34a853 0 240deg,#fbbc05 0 360deg);display:grid;place-items:center"><div style="width:44%;height:44%;border-radius:50%;background:#4285f4;border:.32cqw solid #fff"></div></div>';
 const apps=[["Radio",svgRadio,"#3b82c4"],["BT Muzik",svgBT,"#1976d2"],["Muzik","🎵","#ab47bc"],["Navigasi",svgMaps,"#fff"],["Video","🎬","#ffa726"],["Carlink",svgCar,"#00acc1"],["Kamera","📷","#78909c"],["YouTube",svgYT,"#fff"],["YouTube Music",svgYTM,"#fff"],["Netflix",svgNF,"#141414"],["Maps",svgMaps,"#fff"],["Chrome",svgChrome,"#fff"],["Fail","📁","#8d6e63"],["Galeri","🖼","#5c6bc0"],["Play Store","🛍","#00897b"],["Tetapan","⚙","#607d8b"]];
+/* ikon bergaya kaca: simbol sahaja, tanpa petak latar */
+/* set ikon duotone (Phosphor, lesen MIT): garis dua lapis, warna ikut fungsi */
+const ph=(n,c)=>`<i class="ph-duotone ph-${n}" style="color:${c}"></i>`;
+const vendorIcons={"Radio":ph('radio','#ff6b6b'),"BT Muzik":ph('bluetooth','#5b9bff'),"Muzik":ph('music-notes','#c084fc'),"Navigasi":ph('navigation-arrow','#34d399'),
+  "Video":ph('film-strip','#fb923c'),"Carlink":ph('car-profile','#2dd4bf'),"Kamera":ph('camera','#94a3b8'),"Fail":ph('folder-simple','#fbbf24'),"Galeri":ph('image','#60a5fa'),"Tetapan":ph('gear-six','#94a3b8')};
+apps.forEach(a=>{if(vendorIcons[a[0]])a[1]=vendorIcons[a[0]];});
 const main=[apps[0],apps[7],apps[8],apps[10],apps[1],apps[9]];let pick=-1;
 const drawerEl=document.getElementById('drawer'),dTitle=document.querySelector('#drawer .head span');
 function openDrawer(){dTitle.textContent=pick>=0?`Pilih aplikasi pengganti untuk "${main[pick][0]}"`:'Semua aplikasi';drawerEl.classList.add('open');}
