@@ -118,6 +118,7 @@ public class MainActivity extends Activity implements LocationListener {
     private final String[] tiles = new String[6];
     private int pick = -1;
     private boolean gnssRegistered, hasFix, drawerBuilt;
+    private long lastGpsAt;
 
     // Widgets (recreated by rebuild)
     private SpeedometerView speedo;
@@ -939,7 +940,12 @@ public class MainActivity extends Activity implements LocationListener {
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         try {
             Location last = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            // No satellites (indoors, parked): the Wi-Fi/network position is good enough for weather and prayer times.
+            if (last == null) last = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             if (last != null) useLocation(last);
+            if (lm.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)) {
+                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 60_000, 100, this);
+            }
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, this);
             if (!gnssRegistered) {
                 gnssRegistered = lm.registerGnssStatusCallback(gnss, handler);
@@ -970,6 +976,17 @@ public class MainActivity extends Activity implements LocationListener {
 
     @Override
     public void onLocationChanged(Location l) {
+        if (!LocationManager.GPS_PROVIDER.equals(l.getProvider())) {
+            // Network position: only for place, weather and prayer times; never for speed, trip or the GPS log.
+            if (System.currentTimeMillis() - lastGpsAt > 120_000) {
+                boolean first = !hasFix;
+                useLocation(l);
+                if (first || Math.abs(l.getLatitude() - lat) > .05) wxAt = 0;
+                update();
+            }
+            return;
+        }
+        lastGpsAt = System.currentTimeMillis();
         gpsLog.record(l, satUsed);
         lastSpeed = l.hasSpeed() ? l.getSpeed() * 3.6f : 0f;
         speedo.setSpeed(lastSpeed);

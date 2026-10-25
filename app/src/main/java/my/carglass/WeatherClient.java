@@ -29,10 +29,11 @@ final class WeatherClient {
         r.code = cur.getInt("weather_code");
         try {
             String g = get(String.format(Locale.US,
-                    "https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=12"
+                    "https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14"
                             + "&accept-language=ms&lat=%.4f&lon=%.4f", lat, lng));
             JSONObject a = new JSONObject(g).getJSONObject("address");
-            String place = first(a, "village", "suburb", "town", "city", "municipality", "county");
+            String place = first(a, "village", "hamlet", "suburb", "neighbourhood", "town", "city", "city_district",
+                    "municipality", "county", "state_district");
             String state = first(a, "state");
             r.place = place == null ? state : state == null ? place : place + ", " + state;
         } catch (Exception ignored) {
