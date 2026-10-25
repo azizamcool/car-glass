@@ -1,0 +1,15 @@
+# Build output
+build/
+.gradle/
+*.apk
+*.aab
+
+# Local machine settings and secrets
+local.properties
+*.jks
+*.keystore
+.idea/
+*.iml
+
+# Per-device backups made by tools/preflight.ps1 (they list a person's installed apps)
+backup/

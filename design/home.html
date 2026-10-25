@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Car Glass - Reka Bentuk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,200;0,300;0,500;0,600;0,700;0,800;1,700;1,800&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;600;800&family=Saira:ital,wght@0,200;0,300;0,500;0,700;1,700;1,800&display=swap" rel="stylesheet">
+<style>
+  :root { --acc:#4fc3f7; --bg1:#0b1220; --bg2:#1b2a4a; }
+  [data-theme="sport"] { --acc:#ff5252; --bg1:#120a0a; --bg2:#3a1418; }
+  [data-theme="hijau"] { --acc:#69f0ae; --bg1:#07130f; --bg2:#12392c; }
+  * { box-sizing:border-box; margin:0; }
+  body { font-family:"Segoe UI",Roboto,sans-serif; }
+  .screen { --font:'Exo 2',sans-serif; font-family:var(--font); }
+  .screen *, .screen svg text { font-family:inherit; }
+  body { background:#000; color:#fff; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:12px; }
+  .bar { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .bar button { background:#222; color:#fff; border:1px solid #444; border-radius:20px; padding:6px 16px; cursor:pointer; font-size:14px; }
+  .bar button.on { background:var(--acc); color:#000; border-color:var(--acc); }
+  .wrap { width:min(100%,1280px); aspect-ratio:16/9; container-type:inline-size; }
+  .screen { width:100%; height:100%; border-radius:2cqw; overflow:hidden; position:relative; padding:2.4cqw 2.6cqw 1.6cqw;
+    background:radial-gradient(ellipse at 20% 10%, var(--bg2), var(--bg1) 70%); display:grid; grid-template-columns:36% 1fr; gap:2.4cqw; }
+  .glow { position:absolute; width:40cqw; height:40cqw; border-radius:50%; background:var(--acc); opacity:.12; filter:blur(8cqw); left:-6cqw; top:6cqw; pointer-events:none; }
+  .left { position:relative; display:flex; align-items:center; justify-content:center; }
+  .gauge { width:100%; max-width:34cqw; }
+  .num { font-size:9.5cqw; font-weight:200; fill:#fff; }
+  .unit { font-size:2cqw; fill:rgba(255,255,255,.65); }
+  .right { position:relative; display:flex; flex-direction:column; min-width:0; }
+  .top { display:flex; justify-content:space-between; align-items:flex-end; }
+  .clock { font-size:5.2cqw; font-weight:200; line-height:1; }
+  .date { font-size:1.5cqw; color:rgba(255,255,255,.65); margin-top:.4cqw; }
+  .info { text-align:right; font-size:1.4cqw; color:rgba(255,255,255,.7); line-height:1.5; }
+  .info b { color:var(--acc); font-weight:600; }
+  .label { font-size:1.2cqw; letter-spacing:.2em; color:rgba(255,255,255,.5); margin:2cqw 0 .8cqw; text-transform:uppercase; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.1cqw; }
+  .tile { background:rgba(255,255,255,.09); border:1px solid rgba(255,255,255,.16); border-radius:1.6cqw; aspect-ratio:1.25; backdrop-filter:blur(14px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.7cqw; font-size:1.4cqw; transition:.15s; }
+  .tile:hover, .tile.sel { background:rgba(255,255,255,.2); border-color:var(--acc); box-shadow:0 0 2cqw -.4cqw var(--acc); transform:translateY(-2px); }
+  .ico { width:4.2cqw; height:4.2cqw; border-radius:1.1cqw; display:grid; place-items:center; font-size:2.4cqw; }
+  .right { padding-bottom:3.2cqw; }
+  .screen[data-mode="siang"] .bg::after { background:linear-gradient(90deg, rgba(0,10,30,.35), rgba(0,10,30,.05) 45%, rgba(0,10,30,.3)); }
+  .screen[data-mode="siang"] .tile:not(.all), .screen[data-mode="siang"] .pt { background:rgba(8,20,45,.42); border-color:rgba(255,255,255,.28); }
+  .screen[data-mode="siang"] .clock, .screen[data-mode="siang"] .date, .screen[data-mode="siang"] .info, .screen[data-mode="siang"] .next-line, .screen[data-mode="siang"] .label { text-shadow:0 1px 6px rgba(0,0,0,.55); }
+  .screen[data-mode="siang"] #track { stroke:rgba(255,255,255,.35); }
+  .grid.big { flex:1; min-height:0; grid-template-columns:repeat(2,1fr); grid-auto-rows:1fr; gap:1.6cqw; }
+  .grid.big .tile { aspect-ratio:auto; flex-direction:row; justify-content:flex-start; padding:0 2.4cqw; font-size:2.3cqw; gap:2cqw; border-radius:2.4cqw; font-weight:500; }
+  .grid.big .ico { width:7.4cqw; height:7.4cqw; border-radius:1.9cqw; font-size:4cqw; flex:none; }
+  .grid.big .tile.all .ico { background:rgba(0,0,0,.15); }
+  .gauge { max-width:none; }
+  .left { padding-bottom:2cqw; }
+  .clock { font-size:6.3cqw!important; font-weight:200; letter-spacing:-.02em; }
+  .date { font-size:1.9cqw!important; }
+  .hint { font-size:1.25cqw; color:var(--acc); margin-top:.5cqw; min-height:1.6cqw; }
+  .screen.rain .bg::after { background:linear-gradient(180deg, rgba(10,20,40,.55), rgba(10,20,40,.4)); }
+  .screen.rain .layer { filter:saturate(.55) brightness(.75); }
+  .left { flex-direction:column!important; }
+  .wxbox { text-align:center; margin-bottom:.4cqw; }
+  .wxbox .loc { font-size:1.6cqw; color:rgba(255,255,255,.8); }
+  .wxbox .wxv { display:flex; gap:1cqw; align-items:center; justify-content:center; font-size:1.7cqw; margin-top:.3cqw; color:rgba(255,255,255,.9); }
+  .wxbox .wxv b { font-size:2.6cqw; font-weight:300; color:#fff; }
+  .wxbox .wi { font-size:2.6cqw; }
+  .gauge { max-width:30cqw!important; }
+  .screen[data-mode="siang"] .wxbox { text-shadow:0 1px 6px rgba(0,0,0,.6); }
+  .chips { display:flex; gap:.8cqw; justify-content:flex-end; margin-bottom:.8cqw; }
+  .chip { display:inline-flex; align-items:center; gap:.6cqw; padding:.5cqw 1.1cqw .5cqw .8cqw; border-radius:2cqw; font-size:1.25cqw; border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.1); }
+  .chip svg { width:1.7cqw; height:1.7cqw; flex:none; }
+  .chip.ok { color:#69f0ae; } .chip.ok .slash { display:none; }
+  .chip.off { color:#ff8a80; border-color:rgba(255,138,128,.5); } .chip.off .slash { display:block; }
+  .chip span { color:#fff; }
+  .layer { position:absolute; inset:0; transition:opacity 1.2s ease; }
+  .layer svg { width:100%; height:100%; display:block; }
+  .screen .tile, .screen .pt { transition:background .8s; }
+  .bg { position:absolute; inset:0; z-index:0; }
+  .bg svg { width:100%; height:100%; display:block; }
+  .bg::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,0,0,.45), rgba(0,0,0,.1) 45%, rgba(0,0,0,.35)); }
+  .left, .right { z-index:1; } .dock, .drawer { z-index:2; } .drawer { z-index:5; }
+  .glow { z-index:0; }
+  .blob { animation:drift 14s ease-in-out infinite alternate; }
+  .blob:nth-child(2) { animation-duration:19s; animation-delay:-5s; }
+  .blob:nth-child(3) { animation-duration:23s; animation-delay:-9s; }
+  @keyframes drift { to { transform:translate(120px,-60px) scale(1.2); } }
+  .streak { animation:fly 3.2s linear infinite; }
+  @keyframes fly { from { opacity:0; transform:translateY(0) scaleY(.3); } 30% { opacity:1; } to { opacity:0; transform:translateY(160px) scaleY(1.4); } }
+  .prayer { display:grid; grid-template-columns:repeat(6,1fr); gap:.8cqw; margin-top:1.6cqw; }
+  .pt { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-radius:1.1cqw; padding:.7cqw 0; text-align:center; font-size:1.15cqw; color:rgba(255,255,255,.6); }
+  .pt b { display:block; font-size:1.7cqw; font-weight:400; color:#fff; margin-top:.15cqw; }
+  .pt.next { border-color:var(--acc); background:rgba(255,255,255,.16); color:var(--acc); }
+  .pt.next b { color:var(--acc); }
+  .next-line { font-size:1.2cqw; color:rgba(255,255,255,.6); margin-top:.6cqw; }
+  .next-line b { color:var(--acc); font-weight:600; }
+  .tile.all { background:var(--acc); color:#000; border-color:var(--acc); font-weight:600; cursor:pointer; }
+  .tile.all .ico { background:rgba(0,0,0,.15)!important; }
+  .drawer { position:absolute; inset:0; background:rgba(6,10,20,.92); backdrop-filter:blur(18px); padding:2.4cqw 2.6cqw; display:none; flex-direction:column; z-index:5; }
+  .drawer.open { display:flex; }
+  .drawer .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.6cqw; font-size:2.2cqw; }
+  .drawer .close { font-size:1.5cqw; padding:.6cqw 1.6cqw; border:1px solid rgba(255,255,255,.3); border-radius:2cqw; cursor:pointer; }
+  .drawer .grid { grid-template-columns:repeat(8,1fr); }
+  .dock { position:absolute; left:2.6cqw; right:2.6cqw; bottom:1.4cqw; display:flex; justify-content:space-between; font-size:1.2cqw; color:rgba(255,255,255,.55); }
+  .dock span::before { content:"\25CF "; color:var(--acc); }
+  .tile { position:relative; user-select:none; -webkit-user-select:none; touch-action:manipulation; }
+  .tile.holding { animation:hold .7s linear forwards; }
+  @keyframes hold { 0% { transform:scale(1); box-shadow:0 0 0 0 var(--acc); } 100% { transform:scale(.95); box-shadow:0 0 0 .55cqw var(--acc); } }
+  .edit { position:absolute; top:.9cqw; right:1.1cqw; font-size:1.25cqw; padding:.35cqw .9cqw; border-radius:1.2cqw; background:rgba(255,255,255,.14); color:rgba(255,255,255,.8); cursor:pointer; }
+  /* ---- Mod siang: panel kaca cerah, teks gelap ---- */
+  .screen[data-mode="siang"] { --acc:#0277bd; color:#0d1b2e; }
+  .screen[data-mode="siang"] .bg::after { background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,0) 45%, rgba(255,255,255,.12)); }
+  .screen[data-mode="siang"] .clock, .screen[data-mode="siang"] .date, .screen[data-mode="siang"] .info, .screen[data-mode="siang"] .info b,
+  .screen[data-mode="siang"] .next-line, .screen[data-mode="siang"] .label, .screen[data-mode="siang"] .wxbox, .screen[data-mode="siang"] .wxbox .loc,
+  .screen[data-mode="siang"] .wxbox .wxv, .screen[data-mode="siang"] .wxbox .wxv b { color:#0d1b2e; text-shadow:none; }
+  .screen[data-mode="siang"] .label, .screen[data-mode="siang"] .date, .screen[data-mode="siang"] .next-line { color:rgba(13,27,46,.72); }
+  .screen[data-mode="siang"] .info b, .screen[data-mode="siang"] .next-line b { color:#01579b; }
+  .screen[data-mode="siang"] .num { fill:#0d1b2e; }
+  .screen[data-mode="siang"] .unit, .screen[data-mode="siang"] #limit { fill:rgba(13,27,46,.65); }
+  .screen[data-mode="siang"] #nums { fill:rgba(13,27,46,.7); }
+  .screen[data-mode="siang"] #ticks { stroke:rgba(13,27,46,.55); }
+  .screen[data-mode="siang"] #track { stroke:rgba(13,27,46,.2); }
+  .screen[data-mode="siang"] .tile:not(.all), .screen[data-mode="siang"] .pt { background:rgba(255,255,255,.58); border-color:rgba(255,255,255,.9); color:#0d1b2e; box-shadow:0 4px 18px -8px rgba(0,30,60,.35); }
+  .screen[data-mode="siang"] .pt b { color:#0d1b2e; }
+  .screen[data-mode="siang"] .pt.next { background:rgba(255,255,255,.85); border-color:#0277bd; color:#0277bd; }
+  .screen[data-mode="siang"] .pt.next b { color:#0277bd; }
+  .screen[data-mode="siang"] .tile.all { background:#0277bd; border-color:#0277bd; color:#fff; }
+  .screen[data-mode="siang"] .tile.all .ico { color:#fff; }
+  .screen[data-mode="siang"] .edit { background:rgba(13,27,46,.1); color:rgba(13,27,46,.75); }
+  .screen[data-mode="siang"] .chip { background:rgba(255,255,255,.7); border-color:rgba(255,255,255,.95); }
+  .screen[data-mode="siang"] .chip span { color:#0d1b2e; }
+  .screen[data-mode="siang"] .chip.ok { color:#1b8a4b; } .screen[data-mode="siang"] .chip.off { color:#c62828; border-color:rgba(198,40,40,.5); }
+  .screen[data-mode="siang"] .hint { color:#01579b; font-weight:600; }
+  .screen { --seg-off:rgba(255,255,255,.14); --seg-red:rgba(255,82,82,.3); }
+  .screen[data-mode="siang"] { --seg-off:rgba(13,27,46,.16); --seg-red:rgba(220,50,50,.3); }
+  .screen[data-mode="siang"] .gauge { background:rgba(255,255,255,.55); border-radius:50%; box-shadow:0 10px 34px -12px rgba(0,40,80,.45); backdrop-filter:blur(10px); }
+  .screen[data-mode="siang"] #segs, .screen[data-mode="siang"] #needle { filter:none!important; }
+  .screen[data-mode="siang"] #needle { fill:#0d1b2e; }
+  .screen[data-mode="siang"] .tile:not(.all), .screen[data-mode="siang"] .pt { background:rgba(255,255,255,.74); }
+  .screen[data-mode="siang"] .pt.next { background:rgba(255,255,255,.92); }
+  .num { paint-order:stroke; }
+  /* ---- 6 app: grid 3x2, ikon di atas ---- */
+  .grid.big { grid-template-columns:repeat(3,1fr); gap:1.3cqw; }
+  .grid.big .tile { flex-direction:column; justify-content:center; padding:0 1cqw; gap:1cqw; font-size:1.9cqw; font-weight:600; text-align:center; border-radius:2.2cqw; }
+  .grid.big .tile { gap:.6cqw!important; padding-top:.4cqw!important; }
+  .grid.big .ico { width:6.8cqw; height:6.8cqw; border-radius:1.8cqw; font-size:4cqw; overflow:hidden; display:grid; place-items:center; box-shadow:0 .5cqw 1.4cqw -.4cqw rgba(0,0,0,.45); }
+  .labelrow { display:flex; justify-content:space-between; align-items:flex-end; }
+  .labelrow .label { margin-bottom:.8cqw; }
+  .allpill { margin-bottom:.8cqw; padding:.65cqw 1.8cqw; border-radius:3cqw; background:var(--acc); color:#04121c; font-size:1.55cqw; font-weight:700; cursor:pointer; white-space:nowrap; }
+  .screen[data-mode="siang"] .allpill { background:#0277bd; color:#fff; }
+  /* ---- Splash NEXUP (animasi sapuan, ikut logo.css laman web) ---- */
+  .splash { position:absolute; inset:0; z-index:30; display:grid; place-items:center; opacity:0; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 42%, #12203a, #05070f 70%); }
+  .splash.hold { opacity:1; }
+  .splash.play { animation:spFade 1.3s ease both; }
+  @keyframes spFade { 0% { opacity:0; } 10% { opacity:1; } 82% { opacity:1; } 100% { opacity:0; } }
+  .nexlogo { --ac:#e63329; --tx:#fff; position:relative; display:inline-flex; align-items:center; font-size:9.5cqw; font-weight:800; letter-spacing:-.015em; }
+  .nexlogo .body { display:flex; align-items:center; gap:.36em; }
+  .nexlogo .wm { color:var(--tx); } .nexlogo .up { color:var(--ac); }
+  .nexlogo .swp { position:absolute; right:-.72em; top:48%; font-size:.52em; line-height:1; color:var(--ac); transform:translateY(-50%); }
+  .splash.play .body { animation:nexBody .85s cubic-bezier(.35,.1,.25,1) both; }
+  .splash.play .swp { animation:nexSwp .85s cubic-bezier(.35,.1,.25,1) both; }
+  @keyframes nexSwp { 0% { transform:translateY(-50%) translateX(calc(-1 * var(--nex-sw,150px))) scale(3.6); } 55% { transform:translateY(-50%) translateX(0) scale(3.6); } 75%,100% { transform:translateY(-50%) translateX(0) scale(1); } }
+  @keyframes nexBody { 0% { clip-path:inset(0 100% 0 0); } 10% { clip-path:inset(0 97% 0 0); } 58% { clip-path:inset(0 4% 0 0); } 75%,100% { clip-path:inset(0 0 0 0); } }
+  .chip { white-space:nowrap; }
+  #wifi > span { max-width:11cqw; overflow:hidden; text-overflow:ellipsis; }
+  .clock { font-weight:700!important; letter-spacing:-.01em; white-space:nowrap; }
+  .clock .ampm { font-size:.3em; font-weight:700; letter-spacing:.06em; margin-left:.28em; color:var(--acc); }
+  .screen[data-mode="siang"] .clock .ampm { color:#0277bd; }
+</style>
+</head>
+<body data-theme="biru">
+<div class="bar" id="themes">
+  <button data-t="biru" class="on">Biru malam</button>
+  <button data-t="sport">Sport merah</button>
+  <button data-t="hijau">Hijau</button>
+  <button data-bg="jalan" class="on">Latar: Jalan malam</button>
+  <button data-bg="bandar">Latar: Bandar</button>
+  <button data-bg="aurora">Latar: Aurora</button>
+  <button data-bg="pantai">Latar: Pantai senja</button>
+  <button data-bg="gunung">Latar: Gunung</button>
+  <button data-bg="neon">Latar: Neon</button>
+  <button data-mode="auto" class="on">Waktu: Auto</button>
+  <button data-mode="siang">Waktu: Siang</button>
+  <button data-mode="malam">Waktu: Malam</button>
+  <button id="drive">Simulasi pemanduan</button>
+  <button id="wtog">Simulasi Wi-Fi putus</button>
+  <button id="h12tog">Jam: 12j (AM/PM)</button>
+  <button id="splashbtn">&#9654; Lihat splash NEXUP</button>
+  <button data-font="'Exo 2',sans-serif" class="on">Font: Exo 2</button>
+  <button data-font="'Rajdhani',sans-serif">Font: Rajdhani</button>
+  <button data-font="'Orbitron',sans-serif">Font: Orbitron</button>
+  <button data-font="'Saira',sans-serif">Font: Saira</button>
+  <button data-font="'Segoe UI',Roboto,sans-serif">Font: Biasa</button>
+  <button id="rtog">Cuaca: Cerah</button>
+  <button data-bg="hutan">Latar: Hutan berkabus</button>
+  <button data-bg="bokeh">Latar: Lampu bandar</button>
+  <label style="font-size:14px;color:#ccc;display:flex;gap:8px;align-items:center">Masa <input id="tslider" type="range" min="0" max="23.99" step="0.05" style="width:220px"> <span id="tval"></span></label>
+</div>
+<div class="wrap"><div class="screen" id="screen">
+  <div class="bg" id="bg"></div>
+  <canvas id="rain" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1"></canvas>
+  <div class="splash" id="splash"><div class="nexlogo" id="nexlogo"><span class="swp">&#9654;</span><span class="body"><svg viewBox="0 0 40 40" width="1.45em" height="1.45em"><rect fill="#e63329" x="4" y="4" width="32" height="32" rx="5"/><rect fill="#c0392b" x="9" y="9" width="22" height="22" rx="3"/><path fill="#e63329" d="M0 10h5v4H0zm0 8h5v4H0zm0 8h5v4H0zm35-16h5v4h-5zm0 8h5v4h-5zm0 8h5v4h-5zM11 0h4v5h-4zm8 0h4v5h-4zm8 0h4v5h-4zM11 35h4v5h-4zm8 0h4v5h-4zm8 0h4v5h-4z"/><path fill="#fff" opacity=".95" d="M14 13v14l14-7z"/></svg><span class="wm">NEX<span class="up">UP</span></span></span></div></div>
+  <div class="glow"></div>
+  <div class="left">
+    <div class="wxbox" id="wx"><div class="loc">&#128205; Kuala Lumpur</div><div class="wxv" id="wxv"><span class="wi">&#9925;</span><b>31&deg;C</b><span>Cerah berawan</span></div><div class="hint" id="whint"></div></div>
+    <svg class="gauge" viewBox="0 0 400 400">
+      <circle cx="200" cy="200" r="192" fill="none" stroke="var(--acc)" stroke-opacity=".3" stroke-width="1.5"/>
+      <g id="segs" style="filter:drop-shadow(0 0 4px var(--acc))"></g>
+      <circle cx="200" cy="200" r="122" fill="none" stroke="var(--acc)" stroke-opacity=".35" stroke-width="1.5"/>
+      <g id="ticks"></g>
+      <g id="nums" font-size="12" fill="rgba(255,255,255,.6)" text-anchor="middle" style="font-style:italic"></g>
+      <polygon id="needle" points="200,52 190,78 210,78" fill="#fff" style="filter:drop-shadow(0 0 6px var(--acc))"/>
+      <text x="200" y="146" text-anchor="middle" font-size="13" letter-spacing="7" font-weight="700" fill="var(--acc)">SPORT</text>
+      <text id="spd" x="200" y="236" text-anchor="middle" class="num" style="font-size:118px;font-style:italic;font-weight:800;letter-spacing:-4px">0</text>
+      <text x="200" y="268" text-anchor="middle" class="unit" style="font-size:18px;letter-spacing:6px;font-weight:600">KM/J</text>    </svg>
+  </div>
+  <div class="right">
+    <div class="top">
+      <div><div class="clock"><span id="ct">14:32</span><span class="ampm" id="ap">PM</span></div><div class="date">Sabtu, 24 Oktober</div></div>
+      <div class="info"><div class="chips"><span class="chip ok" id="wifi"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1.2" fill="currentColor"/><path class="slash" d="M3 3l18 18"/></svg><span>Wi-Fi</span></span><span class="chip ok"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10-5 4V3l5 4L7 17"/></svg><span>Bluetooth</span></span><span class="chip ok" id="gps"><svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg><span>GPS &middot; 4 satelit</span></span></div>Perjalanan <b id="trip">0.0 km</b></div>
+    </div>
+    <div class="prayer" id="prayer"></div>
+    <div class="next-line" id="nextline"></div>
+    <div class="labelrow"><div class="label">Aplikasi &nbsp;&middot;&nbsp; tahan lama untuk tukar</div><div class="allpill" id="allbtn">&#9638;&nbsp; Semua apps</div></div>
+    <div class="grid big" id="g1"></div>
+  </div>
+  <div class="drawer" id="drawer">
+    <div class="head"><span>Semua aplikasi</span><span class="close" id="closeDrawer">Tutup &#10005;</span></div>
+    <div class="grid" id="g3"></div>
+  </div>
+</div></div>
+<script>
+const g1=[["Radio","📻","#ef5350"],["BT Muzik","🎧","#42a5f5"],["Muzik","🎵","#ab47bc"],["Navigasi","🧭","#66bb6a"],["Video","🎬","#ffa726"],["Carlink","📱","#26c6da"],["Kamera","📷","#78909c"]];
+const g2=[["YouTube","▶","#e53935"],["Netflix","N","#c62828"],["Maps","📍","#43a047"],["Chrome","◎","#1e88e5"]];
+const g3=[...g1,...g2,["YT Music","♪","#fb8c00"],["Fail","📁","#8d6e63"],["Galeri","🖼","#5c6bc0"],["Play Store","🛍","#00897b"],["Tetapan","⚙","#607d8b"]];
+const tile=(t,i,ed)=>`<div class="tile${i===0?' sel':''}"><div class="ico" style="background:${t[2]}">${t[1]}</div>${t[0]}</div>`;
+const svgYT='<svg viewBox="0 0 48 48" width="100%" height="100%"><rect x="9" y="14" width="30" height="20" rx="6" fill="#f00"/><path d="M21 19.2v9.6l8-4.8z" fill="#fff"/></svg>';
+const svgYTM='<svg viewBox="0 0 48 48" width="100%" height="100%"><circle cx="24" cy="24" r="14.5" fill="#f00"/><circle cx="24" cy="24" r="10.6" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M21.4 19.4v9.2l7.8-4.6z" fill="#fff"/></svg>';
+const svgMaps='<svg viewBox="0 0 48 48" width="100%" height="100%"><g transform="translate(24 24) scale(.8) translate(-24 -24)"><path d="M6 34l14-6 8 14-14 4z" fill="#34a853"/><path d="M28 28l14-6v14l-12 6z" fill="#4285f4"/><path d="M24 6c-6.6 0-11.5 5-11.5 11.3C12.5 26 24 40 24 40s11.5-14 11.5-22.7C35.5 11 30.6 6 24 6z" fill="#ea4335"/><circle cx="24" cy="17.5" r="4.4" fill="#fff"/></g></svg>';
+const svgNF='<svg viewBox="0 0 48 48" width="100%" height="100%"><rect x="15" y="9" width="6" height="30" fill="#b20710"/><rect x="27" y="9" width="6" height="30" fill="#b20710"/><polygon points="15,9 21,9 33,39 27,39" fill="#e50914"/></svg>';
+const svgRadio='<svg viewBox="0 0 48 48" width="100%" height="100%"><g transform="translate(24 25) scale(.78) translate(-24 -25)"><rect x="7" y="17" width="34" height="21" rx="4" fill="#e3eaf2"/><circle cx="18" cy="27.5" r="6" fill="#4a5a6a"/><circle cx="18" cy="27.5" r="2" fill="#e3eaf2"/><rect x="28" y="22" width="9" height="2.2" rx="1" fill="#4a5a6a"/><rect x="28" y="27" width="9" height="2.2" rx="1" fill="#4a5a6a"/><path d="M30 17l9-9" stroke="#e3eaf2" stroke-width="2.4" stroke-linecap="round"/></g></svg>';
+const svgBT='<svg viewBox="0 0 48 48" width="100%" height="100%"><path d="M17 17l14 14-7 6V11l7 6-14 14" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const svgCar='<svg viewBox="0 0 48 48" width="100%" height="100%"><rect x="15.5" y="8" width="17" height="32" rx="3.5" fill="none" stroke="#fff" stroke-width="2.8"/><circle cx="24" cy="35" r="1.8" fill="#fff"/><path d="M20 16h8" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>';
+const svgChrome='<div style="width:66%;height:66%;border-radius:50%;background:conic-gradient(from 30deg,#ea4335 0 120deg,#34a853 0 240deg,#fbbc05 0 360deg);display:grid;place-items:center"><div style="width:44%;height:44%;border-radius:50%;background:#4285f4;border:.32cqw solid #fff"></div></div>';
+const apps=[["Radio",svgRadio,"#3b82c4"],["BT Muzik",svgBT,"#1976d2"],["Muzik","🎵","#ab47bc"],["Navigasi",svgMaps,"#fff"],["Video","🎬","#ffa726"],["Carlink",svgCar,"#00acc1"],["Kamera","📷","#78909c"],["YouTube",svgYT,"#fff"],["YouTube Music",svgYTM,"#fff"],["Netflix",svgNF,"#141414"],["Maps",svgMaps,"#fff"],["Chrome",svgChrome,"#fff"],["Fail","📁","#8d6e63"],["Galeri","🖼","#5c6bc0"],["Play Store","🛍","#00897b"],["Tetapan","⚙","#607d8b"]];
+const main=[apps[0],apps[7],apps[8],apps[10],apps[1],apps[9]];let pick=-1;
+const drawerEl=document.getElementById('drawer'),dTitle=document.querySelector('#drawer .head span');
+function openDrawer(){dTitle.textContent=pick>=0?`Pilih aplikasi pengganti untuk "${main[pick][0]}"`:'Semua aplikasi';drawerEl.classList.add('open');}
+function closeDrawer(){pick=-1;drawerEl.classList.remove('open');}
+function renderMain(){
+  document.getElementById('g1').innerHTML=main.map((t,i)=>tile(t,i,true)).join('');
+  document.getElementById('allbtn').onclick=()=>{pick=-1;openDrawer();};
+  document.querySelectorAll('#g1 .tile:not(.all)').forEach((el,i)=>{let tm=null;
+    const stop=()=>{clearTimeout(tm);tm=null;el.classList.remove('holding');};
+    el.onpointerdown=()=>{el.classList.add('holding');tm=setTimeout(()=>{stop();pick=i;openDrawer();},700);};
+    el.onpointerup=el.onpointerleave=el.onpointercancel=stop;
+    el.oncontextmenu=e=>e.preventDefault();});}
+document.getElementById('g3').innerHTML=apps.map(tile).join('');
+document.querySelectorAll('#g3 .tile').forEach((el,i)=>el.onclick=()=>{if(pick>=0){main[pick]=apps[i];renderMain();}closeDrawer();});
+renderMain();
+document.getElementById('closeDrawer').onclick=closeDrawer;
+const sol=[["Subuh","05:45"],["Syuruk","06:55"],["Zohor","13:07"],["Asar","16:15"],["Maghrib","19:13"],["Isyak","20:22"]];
+document.getElementById('prayer').innerHTML=sol.map((s,i)=>`<div class="pt${i===3?' next':''}">${s[0]}<b>${s[1]}</b></div>`).join('');
+document.getElementById('nextline').innerHTML='Seterusnya: <b>Asar 16:15</b> &middot; 1 j 43 min lagi';
+
+const cx=200,cy=200,r=160,S=135,SW=270,MAX=200;
+const pt=(deg,rad)=>[cx+rad*Math.cos(deg*Math.PI/180),cy+rad*Math.sin(deg*Math.PI/180)];
+const arc=(a0,a1)=>{const [x0,y0]=pt(a0,r),[x1,y1]=pt(a1,r);return `M${x0},${y0} A${r},${r} 0 ${a1-a0>180?1:0} 1 ${x1},${y1}`;};
+const N=50;let sg='';
+for(let i=0;i<N;i++){sg+=`<path d="${arc(S+SW*i/N+.7,S+SW*(i+1)/N-.7)}" fill="none" stroke-width="18" stroke-linecap="butt"/>`;}
+document.getElementById('segs').innerHTML=sg;
+const segEls=[...document.querySelectorAll('#segs path')];
+let nm='';for(let v=0;v<=MAX;v+=40){const [tx,ty]=pt(S+SW*v/MAX,100);nm+=`<text x="${tx}" y="${ty+4}">${v}</text>`;}
+document.getElementById('nums').innerHTML=nm;
+function set(v){v=Math.max(0,Math.min(MAX,v));const lit=v/MAX*N;
+  segEls.forEach((el,i)=>{const on=i+.5<=lit,fr=i/N;el.style.stroke=on?(fr<.6?'var(--acc)':fr<.8?'#ffb74d':'#ff5252'):(fr>=.8?'var(--seg-red)':'var(--seg-off)');});
+  document.getElementById('needle').setAttribute('transform',`rotate(${S+SW*v/MAX+90} 200 200)`);
+  document.getElementById('spd').textContent=Math.round(v);}
+set(0);
+let timer=null,t0=0,km=0;
+document.getElementById('drive').onclick=e=>{
+  if(timer){clearInterval(timer);timer=null;set(0);e.target.classList.remove('on');return;}
+  e.target.classList.add('on');t0=0;km=0;
+  timer=setInterval(()=>{t0+=.05;const v=70+60*Math.sin(t0*.6)+25*Math.sin(t0*1.7);set(v);km+=v/3600*.05*20;document.getElementById('trip').textContent=km.toFixed(1)+' km';},50);
+};
+const rnd=(()=>{let s=7;return()=>(s=(s*16807)%2147483647)/2147483647;})();
+const bgs={
+jalan:()=>{let m='',st='';
+  for(let i=0;i<14;i++){const x=i*100-40,h=60+rnd()*110;m+=`<polygon points="${x},400 ${x+60},${400-h} ${x+130},400" fill="#0a1020" opacity=".9"/>`;}
+  for(let i=0;i<0;i++){const x=560+rnd()*160;st+=`<rect class="streak" x="${x}" y="${400+rnd()*40}" width="3" height="40" fill="var(--acc)" style="animation-delay:${-rnd()*3}s"/>`;}
+  let dash='';for(let i=0;i<8;i++){const y=420+i*i*5.2,w=3+i*1.3,h=8+i*4;dash+=`<rect x="${640-w/2}" y="${y}" width="${w}" height="${h}" fill="#fff" opacity=".55"/>`;}
+  return `<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05070f"/><stop offset=".6" stop-color="var(--bg2)"/><stop offset="1" stop-color="var(--acc)" stop-opacity=".55"/></linearGradient><radialGradient id="sun"><stop offset="0" stop-color="var(--acc)" stop-opacity=".9"/><stop offset="1" stop-color="var(--acc)" stop-opacity="0"/></radialGradient></defs>
+  <rect width="1280" height="720" fill="url(#sk)"/><circle cx="640" cy="400" r="230" fill="url(#sun)"/>${m}
+  <rect y="400" width="1280" height="320" fill="#070b14"/><polygon points="610,400 670,400 1180,720 100,720" fill="#10192b"/>
+  <polygon points="610,400 622,400 330,720 100,720" fill="var(--acc)" opacity=".25"/><polygon points="658,400 670,400 1180,720 950,720" fill="var(--acc)" opacity=".25"/>${dash}${st}</svg>`;},
+bandar:()=>{let b='',w='';let x=0;
+  while(x<1300){const bw=50+rnd()*70,h=140+rnd()*300,y=560-h;b+=`<rect x="${x}" y="${y}" width="${bw}" height="${h}" fill="#0a1222"/>`;
+    for(let k=0;k<h/26;k++)for(let j=0;j<bw/16;j++)if(rnd()>.62)w+=`<rect x="${x+6+j*16}" y="${y+8+k*22}" width="7" height="10" fill="${rnd()>.5?'var(--acc)':'#ffd54f'}" opacity="${.35+rnd()*.5}"/>`;x+=bw+6;}
+  return `<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="sk2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#04060c"/><stop offset="1" stop-color="var(--bg2)"/></linearGradient></defs><rect width="1280" height="720" fill="url(#sk2)"/>${b}${w}<rect y="560" width="1280" height="160" fill="#060a12"/><rect y="560" width="1280" height="3" fill="var(--acc)" opacity=".6"/></svg>`;},
+aurora:()=>`<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs><filter id="bl"><feGaussianBlur stdDeviation="90"/></filter></defs><rect width="1280" height="720" fill="var(--bg1)"/><g filter="url(#bl)"><circle class="blob" cx="300" cy="200" r="220" fill="var(--acc)" opacity=".5"/><circle class="blob" cx="900" cy="500" r="260" fill="#7c4dff" opacity=".45"/><circle class="blob" cx="1050" cy="120" r="180" fill="#ff4081" opacity=".35"/></g></svg>`
+};
+bgs.siang=()=>{let m='',c='',h='';
+  for(let i=0;i<12;i++){const x=i*115-50,mh=70+rnd()*120;m+=`<polygon points="${x},400 ${x+70},${400-mh} ${x+150},400" fill="#4f86b8" opacity=".85"/>`;}
+  for(let i=0;i<9;i++){const x=rnd()*1280,y=60+rnd()*160,w=70+rnd()*110;c+=`<ellipse cx="${x}" cy="${y}" rx="${w}" ry="${w*.22}" fill="#fff" opacity=".7"/>`;}
+  let dash='';for(let i=0;i<8;i++){const y=420+i*i*5.2,w=3+i*1.3,hh=8+i*4;dash+=`<rect x="${640-w/2}" y="${y}" width="${w}" height="${hh}" fill="#fff" opacity=".85"/>`;}
+  return `<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="dsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b78c9"/><stop offset=".55" stop-color="#8ec9f5"/><stop offset="1" stop-color="#d7eefc"/></linearGradient><radialGradient id="dsun"><stop offset="0" stop-color="#fff6c4"/><stop offset=".35" stop-color="#ffe98a" stop-opacity=".9"/><stop offset="1" stop-color="#ffe98a" stop-opacity="0"/></radialGradient></defs>
+  <rect width="1280" height="720" fill="url(#dsk)"/><circle cx="640" cy="300" r="240" fill="url(#dsun)"/>${c}${m}
+  <rect y="400" width="1280" height="320" fill="#4d8a4a"/><polygon points="610,400 670,400 1180,720 100,720" fill="#3d4450"/>
+  <polygon points="610,400 622,400 330,720 100,720" fill="#fff" opacity=".35"/><polygon points="658,400 670,400 1180,720 950,720" fill="#fff" opacity=".35"/>${dash}</svg>`;};
+bgs.pantai=()=>{let l='';for(let i=0;i<22;i++){const y=400+i*i*.7+i*4,w=60+i*40;l+=`<rect x="${640-w/2+(rnd()-.5)*40}" y="${y}" width="${w}" height="${1.5+i*.25}" fill="#ffd9a0" opacity="${.5-i*.018}"/>`;}
+  return `<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="ps" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a1040"/><stop offset=".35" stop-color="#8e2f6b"/><stop offset=".55" stop-color="#ff7e5f"/><stop offset="1" stop-color="#feb47b"/></linearGradient><linearGradient id="pw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a1b55"/><stop offset="1" stop-color="#120a26"/></linearGradient></defs>
+  <rect width="1280" height="720" fill="url(#ps)"/><circle cx="640" cy="400" r="95" fill="#ffe0a8"/><circle cx="640" cy="400" r="200" fill="#ffb37a" opacity=".25"/>
+  <rect y="400" width="1280" height="320" fill="url(#pw)"/>${l}<path d="M0 470 Q200 440 420 470 T900 470 T1280 455 V720 H0Z" fill="#0b0618" opacity=".0"/></svg>`;};
+bgs.gunung=()=>{const layer=(base,amp,col,op)=>{let p=`M0 ${base}`;for(let x=0;x<=1280;x+=40)p+=` L${x} ${base-amp*(.4+.6*Math.abs(Math.sin(x*.011+base))+rnd()*.25)}`;return `<path d="${p} L1280 720 L0 720Z" fill="${col}" opacity="${op}"/>`;};
+  let st='';for(let i=0;i<70;i++)st+=`<circle cx="${rnd()*1280}" cy="${rnd()*260}" r="${rnd()*1.4+.3}" fill="#fff" opacity="${.3+rnd()*.6}"/>`;
+  return `<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="gs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050816"/><stop offset=".7" stop-color="#1c2b55"/><stop offset="1" stop-color="#4a5f9a"/></linearGradient><filter id="mist"><feGaussianBlur stdDeviation="14"/></filter></defs>
+  <rect width="1280" height="720" fill="url(#gs)"/>${st}<circle cx="1000" cy="130" r="38" fill="#f5f1d8"/><circle cx="1000" cy="130" r="90" fill="#f5f1d8" opacity=".12"/>
+  ${layer(430,170,'#31407a',.9)}<rect y="440" width="1280" height="60" fill="#8fa3d8" opacity=".25" filter="url(#mist)"/>${layer(520,150,'#1d2a58',.95)}<rect y="520" width="1280" height="60" fill="#8fa3d8" opacity=".2" filter="url(#mist)"/>${layer(620,120,'#0e1634',1)}</svg>`;};
+bgs.neon=()=>{let g='';for(let i=-14;i<=14;i++)g+=`<line x1="${640+i*28}" y1="430" x2="${640+i*190}" y2="720" stroke="var(--acc)" stroke-width="1.5" opacity=".55"/>`;
+  for(let i=0;i<9;i++){const y=430+Math.pow(i/8,2.2)*290;g+=`<line x1="0" y1="${y}" x2="1280" y2="${y}" stroke="var(--acc)" stroke-width="1.5" opacity=".5"/>`;}
+  return `<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="ns" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05030f"/><stop offset="1" stop-color="var(--bg2)"/></linearGradient><linearGradient id="nsun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd54f"/><stop offset="1" stop-color="var(--acc)"/></linearGradient><clipPath id="hc"><rect x="0" y="0" width="1280" height="430"/></clipPath></defs>
+  <rect width="1280" height="720" fill="url(#ns)"/><g clip-path="url(#hc)"><circle cx="640" cy="400" r="170" fill="url(#nsun)" opacity=".9"/></g>${g}</svg>`;};
+bgs.hutan=()=>{const tree=(x,b,h,col,op)=>{const w=h*.28;return `<polygon points="${x},${b-h} ${x-w},${b} ${x+w},${b}" fill="${col}" opacity="${op}"/><polygon points="${x},${b-h*1.25} ${x-w*.75},${b-h*.35} ${x+w*.75},${b-h*.35}" fill="${col}" opacity="${op}"/>`;};
+  let t='';for(let l=0;l<3;l++){const cols=['#2e5a4c','#1f4236','#10281f'];for(let i=0;i<22;i++)t+=tree(rnd()*1300,480+l*90,120+l*70+rnd()*60,cols[l],.95);t+=`<rect y="${400+l*90}" width="1280" height="90" fill="#cfe8dc" opacity=".12" filter="url(#fg)"/>`;}
+  return `<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="hs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c2a2a"/><stop offset=".6" stop-color="#2d6a5f"/><stop offset="1" stop-color="#9ac9b8"/></linearGradient><filter id="fg"><feGaussianBlur stdDeviation="16"/></filter></defs><rect width="1280" height="720" fill="url(#hs)"/><circle cx="260" cy="170" r="140" fill="#e8f5d0" opacity=".14"/>${t}<rect y="640" width="1280" height="80" fill="#08140f"/></svg>`;};
+bgs.bokeh=()=>{let b='';const cols=['var(--acc)','#ffd54f','#ff4081','#fff','#7c4dff'];for(let i=0;i<46;i++){const r=14+rnd()*52;b+=`<circle cx="${rnd()*1280}" cy="${150+rnd()*480}" r="${r}" fill="${cols[Math.floor(rnd()*5)]}" opacity="${.12+rnd()*.3}"/>`;}
+  return `<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="bk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05060f"/><stop offset="1" stop-color="var(--bg2)"/></linearGradient><filter id="bb"><feGaussianBlur stdDeviation="3"/></filter></defs><rect width="1280" height="720" fill="url(#bk)"/><g filter="url(#bb)">${b}</g></svg>`;};
+bgs.siang=()=>{let c='',m='';
+  for(const [x,y,w] of [[130,60,90],[360,38,60],[1090,48,95],[800,34,45]])c+=`<g opacity=".55"><ellipse cx="${x}" cy="${y}" rx="${w}" ry="${w*.24}" fill="#fff"/><ellipse cx="${x-w*.4}" cy="${y+w*.06}" rx="${w*.55}" ry="${w*.18}" fill="#fff"/><ellipse cx="${x+w*.45}" cy="${y+w*.07}" rx="${w*.5}" ry="${w*.17}" fill="#fff"/></g>`;
+  for(let i=0;i<12;i++){const x=i*115-50,mh=40+rnd()*60;m+=`<polygon points="${x},420 ${x+70},${420-mh} ${x+150},420" fill="#8fb9da" opacity=".6"/>`;}
+  let dash='';for(let i=0;i<8;i++){const y=440+i*i*4.6,w=3+i*1.3,hh=8+i*4;dash+=`<rect x="${640-w/2}" y="${y}" width="${w}" height="${hh}" fill="#fff" opacity=".75"/>`;}
+  return `<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="dsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f93e0"/><stop offset=".6" stop-color="#9fd2f5"/><stop offset="1" stop-color="#e6f5ff"/></linearGradient><linearGradient id="dgr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fc3a1"/><stop offset="1" stop-color="#5f9a78"/></linearGradient></defs>
+  <rect width="1280" height="720" fill="url(#dsk)"/>${c}${m}<rect y="420" width="1280" height="300" fill="url(#dgr)"/>
+  <polygon points="612,420 668,420 1180,720 100,720" fill="#6d7888"/><polygon points="612,420 622,420 330,720 100,720" fill="#fff" opacity=".3"/><polygon points="658,420 668,420 1180,720 950,720" fill="#fff" opacity=".3"/>${dash}</svg>`;};
+let mode='auto',nightBg='jalan',simT=new Date().getHours()+new Date().getMinutes()/60;
+const RISE=6.95,SET=18.97,FADE=.7; // Syuruk & Maghrib (jam), pudar ~42 min
+const clamp=x=>Math.max(0,Math.min(1,x)),sm=x=>x*x*(3-2*x);
+function dayFactor(t){return Math.min(sm(clamp((t-(RISE-FADE/2))/FADE)),1-sm(clamp((t-(SET-FADE/2))/FADE)));}
+const hhmm=t=>String(Math.floor(t)).padStart(2,'0')+':'+String(Math.round((t%1)*60)).padStart(2,'0').replace('60','59');
+var hour12=true;
+function setClock(){const t=mode==='auto'?simT:new Date().getHours()+new Date().getMinutes()/60;
+  const h=Math.floor(t),m=Math.floor((t%1)*60),mm=String(m).padStart(2,'0');
+  document.getElementById('ct').textContent=hour12?`${h%12||12}:${mm}`:`${String(h).padStart(2,'0')}:${mm}`;
+  document.getElementById('ap').textContent=hour12?(h<12?'AM':'PM'):'';}
+function render(){
+  const f=mode==='siang'?1:mode==='malam'?0:dayFactor(simT);
+  const bg=document.getElementById('bg');
+  if(!bg.dataset.night||bg.dataset.night!==nightBg){bg.innerHTML=`<div class="layer" id="ln">${bgs[nightBg]()}</div><div class="layer" id="ld">${bgs.siang()}</div>`;bg.dataset.night=nightBg;}
+  document.getElementById('ld').style.opacity=f;
+  document.getElementById('screen').dataset.mode=(f>=.5&&!rainOn)?'siang':'malam';
+  document.getElementById('tval').textContent=hhmm(simT)+(mode==='auto'?'  ('+(f>=.99?'siang':f<=.01?'malam':'senja/fajar')+')':'');
+  setClock();
+  document.querySelectorAll('[data-bg]').forEach(b=>b.classList.toggle('on',b.dataset.bg===nightBg));
+  document.querySelectorAll('button[data-mode]').forEach(b=>b.classList.toggle('on',b.dataset.mode===mode));}
+function setBg(k){nightBg=k;render();}
+document.querySelectorAll('button[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;render();});
+document.getElementById('tslider').value=simT;
+document.getElementById('tslider').oninput=e=>{simT=+e.target.value;mode='auto';render();};
+let wifiOn=true;
+function wifi(){const w=document.getElementById('wifi');w.className='chip '+(wifiOn?'ok':'off');w.querySelector('span').textContent=wifiOn?'Rangkaian-Rumah':'Tiada Wi-Fi';document.getElementById('wtog').textContent=wifiOn?'Simulasi Wi-Fi putus':'Simulasi Wi-Fi sambung';
+  const v=document.getElementById('wxv'),ic=rainOn?'&#127783;':'&#9925;',tmp=rainOn?26:31,cond=rainOn?'Hujan':'Cerah berawan';
+  v.innerHTML=wifiOn?`<span class="wi">${ic}</span><b>${tmp}&deg;C</b><span>${cond}</span>`:`<span class="wi" style="opacity:.5">${ic}</span><b style="opacity:.6">${tmp}&deg;C</b><span style="opacity:.6">Kemas kini 2 j lalu</span>`;
+  document.querySelector('#wx .loc').innerHTML='&#128205; Kuala Lumpur'+(wifiOn?'':' <span style="opacity:.55">(disimpan)</span>');
+  document.getElementById('whint').textContent=wifiOn?'':'Sambung Wi-Fi atau hotspot untuk cuaca';
+  document.getElementById('rtog').textContent=rainOn?'Cuaca: Hujan (tekan untuk cerah)':'Cuaca: Cerah (tekan untuk hujan)';
+  document.getElementById('screen').classList.toggle('rain',rainOn);}
+let rainOn=false;
+const cv=document.getElementById('rain'),rc=cv.getContext('2d');let drops=[],glassD=[];
+function sizeRain(){const r=cv.parentElement.getBoundingClientRect();cv.width=r.width;cv.height=r.height;initRain();}
+function initRain(){const k=cv.width/1280;drops=[];for(let i=0;i<110;i++)drops.push({x:Math.random()*cv.width,y:Math.random()*cv.height,l:(12+Math.random()*22)*k,v:(16+Math.random()*10)*k,a:.18+Math.random()*.3});
+  glassD=[];for(let i=0;i<18;i++)glassD.push({x:Math.random()*cv.width,y:Math.random()*cv.height,r:(2+Math.random()*4.5)*k,s:0,w:Math.random()*200});}
+function rainLoop(){if(!rainOn){rc.clearRect(0,0,cv.width,cv.height);return;}
+  rc.clearRect(0,0,cv.width,cv.height);const k=cv.width/1280;rc.lineWidth=1.3*k;rc.lineCap='round';
+  for(const d of drops){rc.strokeStyle=`rgba(200,225,255,${d.a})`;rc.beginPath();rc.moveTo(d.x,d.y);rc.lineTo(d.x-d.l*.25,d.y+d.l);rc.stroke();d.y+=d.v;d.x-=d.v*.22;if(d.y>cv.height||d.x<0){d.y=-d.l;d.x=Math.random()*cv.width*1.2;}}
+  for(const g of glassD){const gr=rc.createRadialGradient(g.x-g.r*.3,g.y-g.r*.3,g.r*.1,g.x,g.y,g.r);gr.addColorStop(0,'rgba(255,255,255,.75)');gr.addColorStop(1,'rgba(160,200,255,.12)');rc.fillStyle=gr;rc.beginPath();rc.ellipse(g.x,g.y,g.r,g.r*1.25,0,0,7);rc.fill();
+    if(g.w>0)g.w--;else{g.s=g.s||Math.random()*.9+.2;g.y+=g.s;g.x+=Math.sin(g.y*.05)*.2;if(Math.random()<.01){g.s=0;g.w=60+Math.random()*180;}if(g.y>cv.height+10){g.y=-10;g.x=Math.random()*cv.width;g.s=0;g.w=Math.random()*120;}}}
+  requestAnimationFrame(rainLoop);}
+window.addEventListener('resize',sizeRain);sizeRain();
+document.getElementById('rtog').onclick=()=>{rainOn=!rainOn;wifi();render();if(rainOn)rainLoop();else rc.clearRect(0,0,cv.width,cv.height);};
+document.getElementById('wtog').onclick=()=>{wifiOn=!wifiOn;wifi();};wifi();
+render();
+document.querySelectorAll('[data-bg]').forEach(b=>b.onclick=()=>setBg(b.dataset.bg));
+document.querySelectorAll('button[data-font]').forEach(b=>b.onclick=()=>{document.getElementById('screen').style.setProperty('--font',b.dataset.font);document.querySelectorAll('button[data-font]').forEach(x=>x.classList.toggle('on',x===b));});
+document.getElementById('h12tog').onclick=e=>{hour12=!hour12;e.target.textContent=hour12?'Jam: 12j (AM/PM)':'Jam: 24j';render();};
+function playSplash(){const s=document.getElementById('splash'),l=document.getElementById('nexlogo');s.classList.remove('play','hold');l.style.setProperty('--nex-sw',l.offsetWidth+'px');void s.offsetWidth;s.classList.add('play');}
+document.getElementById('splashbtn').onclick=playSplash;
+if(location.hash.includes('splashhold'))document.getElementById('splash').classList.add('hold');
+{const h=location.hash;const fm={rajdhani:1,orbitron:2,saira:3};for(const k in fm)if(h.includes(k))document.querySelectorAll('button[data-font]')[fm[k]].click();if(h.includes('siang')){mode='siang';}if(h.includes('malam')){mode='malam';}if(h.includes('hujan')){rainOn=true;wifi();}if(h.includes('drive')){document.getElementById('drive').click();}render();}
+document.getElementById('themes').addEventListener('click',e=>{const t=e.target.dataset.t;if(!t)return;
+  document.body.dataset.theme=t;document.querySelectorAll('#themes [data-t]').forEach(b=>b.classList.toggle('on',b===e.target));});
+</script>
+</body>
+</html>
