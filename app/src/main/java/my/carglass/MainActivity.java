@@ -117,7 +117,7 @@ public class MainActivity extends Activity implements LocationListener {
     private boolean fetching;
     private final String[] tiles = new String[6];
     private int pick = -1;
-    private boolean gnssRegistered, hasFix;
+    private boolean gnssRegistered, hasFix, drawerBuilt;
 
     // Widgets (recreated by rebuild)
     private SpeedometerView speedo;
@@ -288,7 +288,9 @@ public class MainActivity extends Activity implements LocationListener {
         glassViews.clear();
         contentHolder.removeAllViews();
         contentHolder.addView(buildContent(), new FrameLayout.LayoutParams(-1, -1));
-        buildDrawer();
+        // The app list (icons for every app) is built the first time it is opened, not at start-up.
+        drawer.removeAllViews();
+        drawerBuilt = false;
         rainView.setVisibility(raining ? View.VISIBLE : View.GONE);
         bg.setRain(raining);
         speedo.setSpeedImmediate(lastSpeed);
@@ -669,6 +671,10 @@ public class MainActivity extends Activity implements LocationListener {
     }
 
     private void openDrawer(int forIndex) {
+        if (!drawerBuilt) {
+            buildDrawer();
+            drawerBuilt = true;
+        }
         pick = forIndex;
         drawerTitle.setText(forIndex >= 0
                 ? "Pilih aplikasi pengganti untuk \"" + (tiles[forIndex] == null ? "kotak kosong" : labelFor(tiles[forIndex])) + "\""
