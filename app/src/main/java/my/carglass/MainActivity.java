@@ -128,6 +128,16 @@ public class MainActivity extends Activity implements LocationListener {
     private final TextView[] chipTv = new TextView[3];
     private final ImageView[] chipIv = new ImageView[3];
 
+    private MediaWatcher media;
+    private MediaCard mediaCard;
+    private String mediaDemo;
+    private final Runnable mediaTick = new Runnable() {
+        @Override public void run() {
+            updateMedia(); // moves the progress line; cheap
+            handler.postDelayed(this, 1000);
+        }
+    };
+
     private final Runnable tick = new Runnable() {
         @Override public void run() {
             pollNet();
@@ -166,6 +176,7 @@ public class MainActivity extends Activity implements LocationListener {
         cq = Math.max(dm.widthPixels, dm.heightPixels) / 100f;
         prefs = getSharedPreferences("cg", MODE_PRIVATE);
         gpsLog = new GpsLog(this);
+        media = new MediaWatcher(this, handler, this::updateMedia);
         lat = Double.longBitsToDouble(prefs.getLong("lat", Double.doubleToLongBits(DEFAULT_LAT)));
         lng = Double.longBitsToDouble(prefs.getLong("lng", Double.doubleToLongBits(DEFAULT_LNG)));
         hasFix = prefs.contains("lat");
@@ -296,6 +307,44 @@ public class MainActivity extends Activity implements LocationListener {
         bg.setRain(raining);
         speedo.setSpeedImmediate(lastSpeed);
         refreshTexts();
+        updateMedia();
+    }
+
+    // ------------------------------------------------------------------ media card
+
+    private void updateMedia() {
+        if (mediaCard == null) return;
+        MediaWatcher.State s = mediaDemo == null ? media.get() : demoState();
+        mediaCard.show(s, media.hasAccess() || mediaDemo != null);
+    }
+
+    /** Fake player for screenshots (adb --es media play|idle|off). */
+    private MediaWatcher.State demoState() {
+        if (!"play".equals(mediaDemo)) return null;
+        MediaWatcher.State s = new MediaWatcher.State();
+        s.source = "YouTube Music";
+        s.title = "Tiada Lagi Sedih";
+        s.artist = "Hael Husaini";
+        s.playing = true;
+        s.duration = 210_000;
+        s.position = 80_000;
+        return s;
+    }
+
+    private void openMediaApp(String which) {
+        String pkg = "ytm".equals(which) ? "com.google.android.apps.youtube.music"
+                : "radio".equals(which) ? "com.imotor.fmam" : "com.imotor.btmusic";
+        Intent i = getPackageManager().getLaunchIntentForPackage(pkg);
+        if (i != null) launchApp(i);
+        else Toast.makeText(this, "App tidak dipasang", Toast.LENGTH_SHORT).show();
+    }
+
+    private void openMediaAccess() {
+        try {
+            startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS));
+        } catch (Exception e) {
+            Toast.makeText(this, "Tetapan tiada pada unit ini. Guna tools\\install.ps1 -MediaAccess", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void speedoReset() {
@@ -347,9 +396,20 @@ public class MainActivity extends Activity implements LocationListener {
         speedo = new SpeedometerView(this);
         speedo.setTheme(light, accent());
         if (light) speedo.setBackground(glassBg(speedo, 0f, false, true));
-        LinearLayout.LayoutParams sl = lp(px(30.5f), px(30.5f), 0);
+        LinearLayout.LayoutParams sl = lp(px(25.5f), px(25.5f), 0);
         sl.topMargin = px(.8f);
         left.addView(speedo, sl);
+        mediaCard = new MediaCard(this, cq, light, accent(), fg(), fgSoft(), new MediaCard.Actions() {
+            @Override public void previous() { media.previous(); }
+            @Override public void toggle() { media.toggle(); }
+            @Override public void next() { media.next(); }
+            @Override public void open(String which) { openMediaApp(which); }
+            @Override public void grantAccess() { openMediaAccess(); }
+        });
+        mediaCard.setBackground(glassBg(mediaCard, 2f, false, false));
+        LinearLayout.LayoutParams mcl = lp(-1, -2, 0);
+        mcl.topMargin = px(1.2f);
+        left.addView(mediaCard, mcl);
         content.addView(left, lp(0, -1, 36f));
 
         // ---- right
@@ -980,6 +1040,9 @@ public class MainActivity extends Activity implements LocationListener {
     protected void onResume() {
         super.onResume();
         handler.post(tick);
+        media.start();
+        handler.removeCallbacks(mediaTick);
+        handler.post(mediaTick);
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
@@ -1023,6 +1086,8 @@ public class MainActivity extends Activity implements LocationListener {
     protected void onPause() {
         super.onPause();
         handler.removeCallbacks(tick);
+        handler.removeCallbacks(mediaTick);
+        media.stop();
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         lm.removeUpdates(this);
         if (gnssRegistered) {
@@ -1061,7 +1126,7 @@ public class MainActivity extends Activity implements LocationListener {
         super.onNewIntent(i);
         closeDrawer();
         if (i == null) return;
-        // Test hooks (adb): --ez splash true, --ez rain true|false, --ef day 0|1 (-1 clears).
+        // Test hooks (adb): --ez splash true, --ez rain true|false, --ef day 0|1 (-1 clears), --es media play|idle|off.
         if (i.getBooleanExtra("splash", false)) splash.play(null);
         if (i.hasExtra("rain")) raining = i.getBooleanExtra("rain", false);
         if (i.hasExtra("day")) dayOverride = i.getFloatExtra("day", -1f);
@@ -1071,6 +1136,11 @@ public class MainActivity extends Activity implements LocationListener {
             fake.setAccuracy(5f);
             fake.setElapsedRealtimeNanos(android.os.SystemClock.elapsedRealtimeNanos() - 80_000_000L);
             gpsLog.record(fake, 7);
+        }
+        if (i.hasExtra("media")) { // play | idle | off (back to the real player)
+            String m = i.getStringExtra("media");
+            mediaDemo = "off".equals(m) ? null : m;
+            updateMedia();
         }
         if (i.hasExtra("speed")) {
             lastSpeed = i.getFloatExtra("speed", 0f);

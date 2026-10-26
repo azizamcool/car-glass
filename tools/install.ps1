@@ -6,7 +6,8 @@
 param(
     [Parameter(Mandatory)][string]$Device,
     [string]$Apk = (Join-Path (Split-Path $PSScriptRoot -Parent) 'app\build\outputs\apk\debug\app-debug.apk'),
-    [switch]$SetHome
+    [switch]$SetHome,
+    [switch]$MediaAccess   # lets the media card read what is playing (notification access); only with the user's consent
 )
 . "$PSScriptRoot\common.ps1"
 
@@ -22,6 +23,11 @@ if (-not ($r -match 'Success')) { throw "Pemasangan gagal." }
 Invoke-Adb $Device @('shell', 'pm', 'grant', 'my.carglass', 'android.permission.ACCESS_FINE_LOCATION') | Out-Null
 Invoke-Adb $Device @('shell', 'am', 'start', '-n', 'my.carglass/.MainActivity') | Out-Null
 Write-Host "Car Glass dibuka sebagai app biasa." -ForegroundColor Green
+
+if ($MediaAccess) {
+    Invoke-Adb $Device @('shell', 'cmd', 'notification', 'allow_listener', 'my.carglass/my.carglass.MediaAccess') | Out-Null
+    Write-Host "Akses media diberi. Tarik balik: adb shell cmd notification disallow_listener my.carglass/my.carglass.MediaAccess" -ForegroundColor Green
+}
 
 if ($SetHome) {
     Invoke-Adb $Device @('shell', 'cmd', 'package', 'set-home-activity', 'my.carglass/.MainActivity') | Out-Null

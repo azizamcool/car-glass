@@ -23,5 +23,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Notification access lets Car Glass read what is playing and press play/pause/next. -->
+        <service
+            android:name=".MediaAccess"
+            android:exported="true"
+            android:label="Car Glass"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>

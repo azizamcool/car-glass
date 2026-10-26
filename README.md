@@ -46,6 +46,10 @@ Lagi latar: [pantai](docs/images/design/latar-pantai.jpg), [gunung](docs/images/
 - **Kaca berkabur** (kabur dibuat daripada latar kerana Android 11 tiada kabur langsung) dan ikon tanpa petak latar.
 - **Siang / malam** dengan pudar sekitar Syuruk dan Maghrib; **hujan** bila cuaca menunjukkan hujan.
 - **Splash** pendek (sekitar 1.3 saat) bila app dimulakan atau unit bangun.
+- **Kad media** di bawah speedometer: tajuk, artis, kulit album, bar kemajuan dan butang sebelumnya/main/seterusnya
+  untuk YouTube Music, YouTube dan Bluetooth muzik. Bila tiada media, kad menunjukkan pintasan YouTube Music, Radio
+  dan BT. Perlu *Notification access* untuk Car Glass (sekali sahaja): Tetapan, atau
+  `.\tools\install.ps1 -Device ... -MediaAccess`. Kawalan radio hanya jika app radio unit menyiarkan sesi media.
 - **Butang "Kemaskini apps"** dalam senarai Semua apps: satu ketik ke Play Store untuk kemas kini manual
   (kemas kini automatik sebaiknya dimatikan supaya unit tidak tersekat; lihat Fasa 6 dalam [AGENTS.md](AGENTS.md)).
 - **Audit RAM:** `tools\ram-audit.ps1` menunjukkan proses berat dan app yang jarang digunakan (hanya membaca).
@@ -61,6 +65,7 @@ untuk unit 2 GB RAM.
 | `MainActivity` | Skrin utama: susun atur, tema siang/malam, enam kotak app, laci Semua apps, lokasi GPS dan rangkaian, pengait ujian ADB |
 | `SpeedometerView` | Speedometer 50 segmen, zon merah, jarum, nombor condong |
 | `BackgroundView`, `GlassDrawable` | Latar dan kaca: kabur dibuat lebih awal daripada latar (Android 11 tiada kabur langsung) |
+| `MediaCard`, `MediaWatcher`, `MediaAccess` | Kad media: ikut sesi media yang aktif (MediaSession), lukis kad dan butang; `MediaAccess` ialah pendengar notifikasi kosong yang diperlukan Android untuk akses itu |
 | `RainView` | Efek titisan hujan |
 | `SplashView` | Splash NEXUP sekitar 1.3 saat |
 | `PrayerTimes` | Waktu solat dikira dalam app (Subuh/Isyak 18°, Asar mazhab Syafie), tanpa internet |
