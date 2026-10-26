@@ -316,6 +316,14 @@ public class MainActivity extends Activity implements LocationListener {
         wx.setGravity(Gravity.CENTER_HORIZONTAL);
         locTv = text(1.9f, fgSoft(), 500);
         locTv.setGravity(Gravity.CENTER);
+        // Long-press the place name to hide or show it (handy for screenshots and videos).
+        locTv.setOnLongClickListener(v -> {
+            boolean now = !prefs.getBoolean("hidePlace", false);
+            prefs.edit().putBoolean("hidePlace", now).apply();
+            Toast.makeText(this, now ? "Nama tempat disembunyikan" : "Nama tempat dipaparkan", Toast.LENGTH_SHORT).show();
+            refreshWeather();
+            return true;
+        });
         wx.addView(locTv);
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER_VERTICAL);
@@ -471,6 +479,16 @@ public class MainActivity extends Activity implements LocationListener {
         chipIv[idx] = iv;
         c.setClickable(true);
         c.setOnClickListener(v -> openSettings(idx));
+        if (idx == 0) {
+            // Long-press the Wi-Fi chip to hide or show the network name (handy for screenshots and videos).
+            c.setOnLongClickListener(v -> {
+                boolean now = !prefs.getBoolean("hideSsid", false);
+                prefs.edit().putBoolean("hideSsid", now).apply();
+                Toast.makeText(this, now ? "Nama Wi-Fi disembunyikan" : "Nama Wi-Fi dipaparkan", Toast.LENGTH_SHORT).show();
+                updateChips();
+                return true;
+            });
+        }
         LinearLayout.LayoutParams cl = lp(-2, -2, 0);
         cl.leftMargin = px(.8f);
         c.setLayoutParams(cl);
@@ -823,7 +841,8 @@ public class MainActivity extends Activity implements LocationListener {
         boolean have = wxTemp != null;
         long age = System.currentTimeMillis() - wxAt;
         boolean stale = have && !internet;
-        locTv.setText("📍 " + (!hasFix ? "Menunggu GPS" : wxPlace != null ? wxPlace : "Lokasi")
+        boolean hidePlace = prefs.getBoolean("hidePlace", false);
+        locTv.setText("📍 " + (!hasFix ? "Menunggu GPS" : hidePlace ? "Malaysia" : wxPlace != null ? wxPlace : "Lokasi")
                 + (stale ? "  (disimpan)" : ""));
         float dim = stale ? .6f : 1f;
         wxIconTv.setAlpha(dim);
@@ -851,7 +870,8 @@ public class MainActivity extends Activity implements LocationListener {
 
     private void updateChips() {
         if (chipTv[0] == null) return;
-        setChip(0, wifiOn ? (ssid != null ? ssid : "Wi-Fi") : "Tiada Wi-Fi", wifiOn ? okColor() : badColor());
+        boolean hide = prefs.getBoolean("hideSsid", false);
+        setChip(0, wifiOn ? (ssid != null && !hide ? ssid : "Wi-Fi") : "Tiada Wi-Fi", wifiOn ? okColor() : badColor());
         setChip(1, btOn ? (btName != null ? btName : "Bluetooth") : "Bluetooth mati",
                 btName != null ? okColor() : fgSoft());
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);

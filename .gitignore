@@ -13,3 +13,6 @@ local.properties
 
 # Per-device backups made by tools/preflight.ps1 (they list a person's installed apps)
 backup/
+
+# rakaman video mentah
+media/

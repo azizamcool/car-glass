@@ -233,6 +233,10 @@
   .chip { font-size:1.45cqw; }
   .drawer .ico i { font-size:4.6cqw; }
   .screen[data-mode="siang"] .ico i { filter:drop-shadow(0 .35cqw .6cqw rgba(8,40,100,.3)); }
+  body.bare { padding:0; display:block; background:#000; }
+  body.bare .bar { display:none!important; }
+  body.bare .wrap { width:1280px; height:720px; max-width:none; aspect-ratio:auto; }
+  body.bare .screen { border-radius:0; }
 </style>
 </head>
 <body data-theme="biru">
@@ -316,7 +320,9 @@ const ph=(n,c)=>`<i class="ph-duotone ph-${n}" style="color:${c}"></i>`;
 const vendorIcons={"Radio":ph('radio','#ff6b6b'),"BT Muzik":ph('bluetooth','#5b9bff'),"Muzik":ph('music-notes','#c084fc'),"Navigasi":ph('navigation-arrow','#34d399'),
   "Video":ph('film-strip','#fb923c'),"Carlink":ph('car-profile','#2dd4bf'),"Kamera":ph('camera','#94a3b8'),"Fail":ph('folder-simple','#fbbf24'),"Galeri":ph('image','#60a5fa'),"Tetapan":ph('gear-six','#94a3b8')};
 apps.forEach(a=>{if(vendorIcons[a[0]])a[1]=vendorIcons[a[0]];});
-const main=[apps[0],apps[7],apps[8],apps[10],apps[1],apps[9]];let pick=-1;
+const pintaz=["Pintaz",'<svg viewBox="0 0 48 48" width="100%" height="100%"><path d="M24 5c-7.2 0-13 5.6-13 12.8C11 28 24 43 24 43s13-15 13-25.2C37 10.6 31.200 5 24 5z" fill="#f97316"/><circle cx="24" cy="18" r="5" fill="#fff"/></svg>',"#f97316"];
+apps.push(pintaz);
+const main=[apps[0],apps[7],apps[8],pintaz,apps[1],apps[5]];let pick=-1;
 const drawerEl=document.getElementById('drawer'),dTitle=document.querySelector('#drawer .head span');
 function openDrawer(){dTitle.textContent=pick>=0?`Pilih aplikasi pengganti untuk "${main[pick][0]}"`:'Semua aplikasi';drawerEl.classList.add('open');}
 function closeDrawer(){pick=-1;drawerEl.classList.remove('open');}
@@ -461,6 +467,12 @@ if(location.hash.includes('splashhold'))document.getElementById('splash').classL
 {const h=location.hash;const fm={rajdhani:1,orbitron:2,saira:3};for(const k in fm)if(h.includes(k))document.querySelectorAll('button[data-font]')[fm[k]].click();if(h.includes('siang')){mode='siang';}if(h.includes('malam')){mode='malam';}if(h.includes('hujan')){rainOn=true;wifi();}if(h.includes('drive')){document.getElementById('drive').click();}render();}
 document.getElementById('themes').addEventListener('click',e=>{const t=e.target.dataset.t;if(!t)return;
   document.body.dataset.theme=t;document.querySelectorAll('#themes [data-t]').forEach(b=>b.classList.toggle('on',b===e.target));});
+/* pautan pintas untuk tangkap skrin: #bare (tanpa bar kawalan), #bg-bandar, #tema-sport, #drawer */
+{const h=location.hash;
+ if(h.includes('bare'))document.body.classList.add('bare');
+ const mb=h.match(/bg-(\w+)/); if(mb&&bgs[mb[1]]){nightBg=mb[1];render();}
+ const mt=h.match(/tema-(\w+)/); if(mt){const b=document.querySelector(`button[data-t="${mt[1]}"]`); if(b)b.click();}
+ if(h.includes('drawer'))document.getElementById('allbtn').click();}
 </script>
 </body>
 </html>
