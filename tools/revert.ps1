@@ -11,6 +11,13 @@ if (-not (Test-Path $file)) {
 $component = (Get-Content $file -Raw).Trim()
 if ($component -notmatch '^[\w.]+/[\w.$]+$') { throw "Sandaran Home tidak sah: '$component'" }
 
+# The stock launcher may have been disabled to keep Car Glass as the only Home; bring it back first (harmless if enabled).
+$pkg = ($component -split '/')[0]
+$disabled = (Invoke-Adb $Device @('shell', 'pm', 'list', 'packages', '-d', $pkg)) -contains "package:$pkg"
+if ($disabled) {
+    Invoke-Adb $Device @('shell', 'pm', 'enable', '--user', '0', $pkg) | Out-Null
+    Write-Host "Launcher asal ($pkg) diaktifkan semula." -ForegroundColor Green
+}
 Invoke-Adb $Device @('shell', 'cmd', 'package', 'set-home-activity', $component) | Out-Null
 $now = Get-HomeComponent $Device
 if ($now -eq $component) { Write-Host "Home asal dipulihkan: $now" -ForegroundColor Green }

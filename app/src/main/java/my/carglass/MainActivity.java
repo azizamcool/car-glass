@@ -564,6 +564,14 @@ public class MainActivity extends Activity implements LocationListener {
         drawerTitle = text(2.2f, fg(), 600);
         drawerTitle.setText("Semua aplikasi");
         head.addView(drawerTitle, lp(0, -2, 1f));
+        TextView stock = text(1.6f, fg(), 500);
+        stock.setText("Launcher stok");
+        stock.setPadding(px(2f), px(.8f), px(2f), px(.8f));
+        stock.setBackground(glass(false, 2f));
+        stock.setOnClickListener(v -> openStockLauncher());
+        LinearLayout.LayoutParams sk = lp(-2, -2, 0);
+        sk.rightMargin = px(1.2f);
+        head.addView(stock, sk);
         TextView update = text(1.6f, light ? Color.WHITE : 0xFF04121C, 700);
         update.setText("Kemaskini apps");
         update.setPadding(px(2f), px(.8f), px(2f), px(.8f));
@@ -653,6 +661,35 @@ public class MainActivity extends Activity implements LocationListener {
         lp.setMargins(px(.4f), px(.4f), px(.4f), px(.4f));
         c.setLayoutParams(lp);
         return c;
+    }
+
+    /**
+     * Opens the manufacturer's own home screen. It may have been disabled over ADB so that Car Glass is always the
+     * Home (see AGENTS.md); an app cannot re-enable another package, so in that case it only explains how.
+     */
+    private void openStockLauncher() {
+        final String pkg = "com.android.launcher3";
+        closeDrawer();
+        boolean enabled;
+        try {
+            enabled = getPackageManager().getApplicationInfo(pkg, 0).enabled;
+        } catch (PackageManager.NameNotFoundException e) {
+            Toast.makeText(this, "Launcher stok tiada pada unit ini", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (enabled) {
+            Intent i = new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+                    .setClassName(pkg, "com.android.launcher3.Launcher")
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
+                startActivity(i);
+                return;
+            } catch (Exception ignored) {
+            }
+        }
+        // On the Mohawk unit the Settings app greys out "Enable" for this package, so it cannot be re-enabled here.
+        Toast.makeText(this, "Launcher stok dilumpuhkan. Pulihkan melalui komputer: tools\\revert.ps1 (ADB).",
+                Toast.LENGTH_LONG).show();
     }
 
     /**

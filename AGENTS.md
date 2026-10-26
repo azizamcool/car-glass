@@ -74,6 +74,16 @@ Tujuannya: unit tidak tersekat. **Semak dahulu, cadang, tunggu persetujuan, baru
    cip GPS melaporkan 1 Hz; `age_ms` yang besar bermaksud bacaan sampai lewat.
 6. Kemas kini Android/firmware: hanya daripada pembekal. Beritahu pengguna, jangan flash sendiri.
 
+### Pilihan: lumpuhkan launcher asal (hanya jika pengguna meminta)
+Jika Home asal sering muncul kerana ia masih berada dalam susunan tugasan di bawah Car Glass (lihat
+`dumpsys activity activities`: dua tugasan `type=home`), `pm disable-user --user 0 <launcher asal>` memastikan
+Home sentiasa Car Glass. **Terangkan kos ini dahulu dan dapatkan persetujuan:**
+- App tidak boleh mengaktifkannya semula; pada unit Mohawk, app Settings juga **tidak menawarkan "Enable"** untuk
+  pakej ini (butang itu kelabu). Pemulihan hanya melalui ADB: `tools/revert.ps1` (ia mengaktifkan semula pakej).
+- Ujian selepas melumpuhkan: Home lalai masih Car Glass, `force-stop` Car Glass + HOME kembali ke Car Glass, dan
+  hanya Car Glass dan `FallbackHome` Settings kekal sebagai calon HOME.
+- Jangan sekali-kali lakukan ini tanpa `backup/<unit>/home.txt` (supaya revert tahu apa yang dipulihkan).
+
 ### Penutup
 Beri pengguna: cara kembali ke Home asal (`tools/revert.ps1`), cara tukar enam app, dan apa yang telah diubah.
 
