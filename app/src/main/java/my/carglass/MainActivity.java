@@ -1101,9 +1101,10 @@ public class MainActivity extends Activity implements LocationListener {
         if (!LocationManager.GPS_PROVIDER.equals(l.getProvider())) {
             // Network position: only for place, weather and prayer times; never for speed, trip or the GPS log.
             if (System.currentTimeMillis() - lastGpsAt > 120_000) {
-                boolean first = !hasFix;
+                // Compare with the saved position before overwriting it, otherwise a move never refreshes the weather.
+                boolean moved = !hasFix || Math.abs(l.getLatitude() - lat) > .05 || Math.abs(l.getLongitude() - lng) > .05;
                 useLocation(l);
-                if (first || Math.abs(l.getLatitude() - lat) > .05) wxAt = 0;
+                if (moved) wxAt = 0;
                 update();
             }
             return;
