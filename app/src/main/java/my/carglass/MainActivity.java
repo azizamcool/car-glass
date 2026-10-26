@@ -1015,16 +1015,24 @@ public class MainActivity extends Activity implements LocationListener {
         if (android.os.Build.VERSION.SDK_INT < 30
                 || checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return;
         long now = android.os.SystemClock.elapsedRealtime();
-        if (!force && now - lastNetAskAt < 5 * 60_000L) return;
+        if (!force && now - lastNetAskAt < 2 * 60_000L) return;
         lastNetAskAt = now;
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        // While driving on a hotspot the position can stay frozen for many minutes, because Android reuses its last
+        // Wi-Fi scan. Ask for a fresh scan first, then for the position a few seconds later.
         try {
-            if (!lm.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)) return;
-            lm.getCurrentLocation(LocationManager.NETWORK_PROVIDER, null, getMainExecutor(), l -> {
-                if (l != null) onLocationChanged(l);
-            });
-        } catch (SecurityException | IllegalArgumentException ignored) {
+            ((WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE)).startScan();
+        } catch (RuntimeException ignored) {
         }
+        handler.postDelayed(() -> {
+            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            try {
+                if (!lm.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)) return;
+                lm.getCurrentLocation(LocationManager.NETWORK_PROVIDER, null, getMainExecutor(), l -> {
+                    if (l != null) onLocationChanged(l);
+                });
+            } catch (SecurityException | IllegalArgumentException ignored) {
+            }
+        }, 4000);
     }
 
     private void maybeFetchWeather() {
