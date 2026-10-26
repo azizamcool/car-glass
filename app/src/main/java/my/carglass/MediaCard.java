@@ -51,7 +51,7 @@ final class MediaCard extends LinearLayout {
         this.fgSoft = fgSoft;
         this.actions = actions;
         setOrientation(VERTICAL);
-        setPadding(px(1.4f), px(1.1f), px(1.4f), px(1.1f));
+        setPadding(px(1.4f), px(.9f), px(1.4f), px(.9f));
 
         LinearLayout top = new LinearLayout(c);
         top.setGravity(Gravity.CENTER_VERTICAL);
@@ -64,7 +64,7 @@ final class MediaCard extends LinearLayout {
             }
         });
         art.setClipToOutline(true);
-        top.addView(art, new LayoutParams(px(5.8f), px(5.8f)));
+        top.addView(art, new LayoutParams(px(5.2f), px(5.2f)));
 
         LinearLayout meta = new LinearLayout(c);
         meta.setOrientation(VERTICAL);
@@ -93,11 +93,11 @@ final class MediaCard extends LinearLayout {
         prev.setOnClickListener(v -> actions.previous());
         playBtn.setOnClickListener(v -> actions.toggle());
         next.setOnClickListener(v -> actions.next());
-        controls.addView(prev, new LayoutParams(px(4.4f), px(4.4f)));
-        LayoutParams pl = new LayoutParams(px(5.4f), px(5.4f));
+        controls.addView(prev, new LayoutParams(px(4f), px(4f)));
+        LayoutParams pl = new LayoutParams(px(5f), px(5f));
         pl.setMargins(px(2.2f), 0, px(2.2f), 0);
         controls.addView(playBtn, pl);
-        controls.addView(next, new LayoutParams(px(4.4f), px(4.4f)));
+        controls.addView(next, new LayoutParams(px(4f), px(4f)));
         LayoutParams cl = new LayoutParams(-1, -2);
         cl.topMargin = px(.8f);
         addView(controls, cl);

@@ -396,8 +396,8 @@ public class MainActivity extends Activity implements LocationListener {
         speedo = new SpeedometerView(this);
         speedo.setTheme(light, accent());
         if (light) speedo.setBackground(glassBg(speedo, 0f, false, true));
-        LinearLayout.LayoutParams sl = lp(px(25.5f), px(25.5f), 0);
-        sl.topMargin = px(.8f);
+        LinearLayout.LayoutParams sl = lp(px(22.5f), px(22.5f), 0);
+        sl.topMargin = px(.4f);
         left.addView(speedo, sl);
         mediaCard = new MediaCard(this, cq, light, accent(), fg(), fgSoft(), new MediaCard.Actions() {
             @Override public void previous() { media.previous(); }
@@ -408,7 +408,7 @@ public class MainActivity extends Activity implements LocationListener {
         });
         mediaCard.setBackground(glassBg(mediaCard, 2f, false, false));
         LinearLayout.LayoutParams mcl = lp(-1, -2, 0);
-        mcl.topMargin = px(1.2f);
+        mcl.topMargin = px(.8f);
         left.addView(mediaCard, mcl);
         content.addView(left, lp(0, -1, 36f));
 
