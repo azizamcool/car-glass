@@ -405,7 +405,7 @@ public class MainActivity extends Activity implements LocationListener {
         speedo = new SpeedometerView(this);
         speedo.setTheme(light, accent());
         if (light) speedo.setBackground(glassBg(speedo, 0f, false, true));
-        LinearLayout.LayoutParams sl = lp(px(22.5f), px(22.5f), 0);
+        LinearLayout.LayoutParams sl = lp(px(21f), px(21f), 0);
         sl.topMargin = px(.4f);
         left.addView(speedo, sl);
         mediaCard = new MediaCard(this, cq, light, accent(), fg(), fgSoft(), new MediaCard.Actions() {
@@ -458,7 +458,7 @@ public class MainActivity extends Activity implements LocationListener {
         chips.addView(chip(0, R.drawable.ic_wifi));
         chips.addView(chip(1, R.drawable.ic_bt));
         chips.addView(chip(2, R.drawable.ic_gps));
-        rightTop.addView(chips);
+        rightTop.addView(chips, lp(-2, -2, 0)); // wrap_content, so the END gravity lines it up with the trip text
         tripTv = text(1.5f, fgSoft(), 500);
         LinearLayout.LayoutParams trl = lp(-2, -2, 0);
         trl.topMargin = px(1f);
