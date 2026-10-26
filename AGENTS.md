@@ -74,6 +74,11 @@ Tujuannya: unit tidak tersekat. **Semak dahulu, cadang, tunggu persetujuan, baru
    cip GPS melaporkan 1 Hz; `age_ms` yang besar bermaksud bacaan sampai lewat.
 6. Kemas kini Android/firmware: hanya daripada pembekal. Beritahu pengguna, jangan flash sendiri.
 
+### Pilihan: Pakej Ringan (`tools/lighten.ps1`, hanya dengan persetujuan)
+Mengurangkan app latar dan animasi. Ukur dahulu (`ram-audit.ps1`, RAM bebas, masa mula sejuk beberapa app) dan ukur
+semula selepas `-Apply`; beritahu pengguna angka sebenar. Pada unit Mohawk (2 GB) hasilnya sederhana: RAM bebas
++~160 MB, masa mula 2-9% lebih pantas, bilangan proses tidak berubah. Pulihkan dengan `-Restore`.
+
 ### Pilihan: lumpuhkan launcher asal (hanya jika pengguna meminta)
 Jika Home asal sering muncul kerana ia masih berada dalam susunan tugasan di bawah Car Glass (lihat
 `dumpsys activity activities`: dua tugasan `type=home`), `pm disable-user --user 0 <launcher asal>` memastikan
