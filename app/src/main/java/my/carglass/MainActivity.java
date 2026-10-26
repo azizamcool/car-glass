@@ -118,7 +118,7 @@ public class MainActivity extends Activity implements LocationListener {
     private final String[] tiles = new String[6];
     private int pick = -1;
     private boolean gnssRegistered, hasFix, drawerBuilt;
-    private long lastGpsAt;
+    private long lastGpsAt, lastNetAskAt;
 
     // Widgets (recreated by rebuild)
     private SpeedometerView speedo;
@@ -142,6 +142,7 @@ public class MainActivity extends Activity implements LocationListener {
         @Override public void run() {
             pollNet();
             pollBluetooth();
+            askNetworkFix(false);
             maybeFetchWeather();
             update();
             handler.postDelayed(this, 15_000);
@@ -384,6 +385,14 @@ public class MainActivity extends Activity implements LocationListener {
         tl.setMargins(px(1f), 0, px(1f), 0);
         row.addView(wxTempTv, tl);
         row.addView(wxCondTv);
+        // Long-press the temperature to refresh the position and weather right now.
+        row.setOnLongClickListener(v -> {
+            Toast.makeText(this, "Menyegarkan lokasi dan cuaca...", Toast.LENGTH_SHORT).show();
+            wxAt = 0;
+            askNetworkFix(true);
+            maybeFetchWeather();
+            return true;
+        });
         LinearLayout.LayoutParams rl = lp(-2, -2, 0);
         rl.topMargin = px(.4f);
         wx.addView(row, rl);
@@ -995,6 +1004,26 @@ public class MainActivity extends Activity implements LocationListener {
             if (!ad.getProfileProxy(this, l, BluetoothProfile.HEADSET)) pending[0]--;
             if (pending[0] == 0) btName = null;
         } catch (Exception ignored) {
+        }
+    }
+
+    /**
+     * Android only pushes a network position when it thinks you moved about 100 m, which a hotspot rarely does,
+     * so ask for a fresh one now and then (at most every 5 minutes, or at once when forced).
+     */
+    private void askNetworkFix(boolean force) {
+        if (android.os.Build.VERSION.SDK_INT < 30
+                || checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return;
+        long now = android.os.SystemClock.elapsedRealtime();
+        if (!force && now - lastNetAskAt < 5 * 60_000L) return;
+        lastNetAskAt = now;
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        try {
+            if (!lm.getAllProviders().contains(LocationManager.NETWORK_PROVIDER)) return;
+            lm.getCurrentLocation(LocationManager.NETWORK_PROVIDER, null, getMainExecutor(), l -> {
+                if (l != null) onLocationChanged(l);
+            });
+        } catch (SecurityException | IllegalArgumentException ignored) {
         }
     }
 
