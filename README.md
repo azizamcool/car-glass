@@ -20,8 +20,10 @@ Tangkap skrin sebenar daripada unit (1280x720, Wi-Fi dan nama tempat disembunyik
 | ![Malam](docs/images/unit/malam.jpg) | ![Malam laju](docs/images/unit/malam-laju.jpg) | ![Hujan malam](docs/images/unit/hujan-malam.jpg) |
 | **Siang** | **Siang, laju** | **Tukar app (tahan lama)** |
 | ![Siang](docs/images/unit/siang.jpg) | ![Siang laju](docs/images/unit/siang-laju.jpg) | ![Tukar app](docs/images/unit/tukar-app.jpg) |
-| **Semua apps** | **Splash** | |
-| ![Semua apps](docs/images/unit/senarai-apps-malam.jpg) | ![Splash](docs/images/unit/splash-s1.jpg) | |
+| **Semua apps (malam)** | **Semua apps (siang)** | **Splash** |
+| ![Semua apps malam](docs/images/unit/senarai-apps-malam.jpg) | ![Semua apps siang](docs/images/unit/senarai-apps-siang.jpg) | ![Splash](docs/images/unit/splash-s1.jpg) |
+| **Kad media: YouTube** | **Kad media: tiada media** | |
+| ![Kad media YouTube](docs/images/unit/media-youtube-siang.jpg) | ![Kad media tiada](docs/images/unit/media-tiada-siang.jpg) | |
 
 Reka bentuk pratonton (dibuat dalam [design/home.html](design/home.html), boleh dibuka dalam pelayar):
 
