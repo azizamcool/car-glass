@@ -41,6 +41,16 @@ final class WeatherClient {
         return r;
     }
 
+    /** Looks a Malaysian place name up (OpenStreetMap Nominatim). Returns {lat, lng}, or null when nothing matches. */
+    static double[] geocode(String query) throws Exception {
+        String g = get("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=my&q="
+                + java.net.URLEncoder.encode(query, "UTF-8"));
+        org.json.JSONArray a = new org.json.JSONArray(g);
+        if (a.length() == 0) return null;
+        JSONObject o = a.getJSONObject(0);
+        return new double[]{o.getDouble("lat"), o.getDouble("lon")};
+    }
+
     private static String first(JSONObject o, String... keys) {
         for (String k : keys) {
             String v = o.optString(k, "");

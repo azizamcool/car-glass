@@ -2,6 +2,7 @@ package my.carglass;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
@@ -30,12 +31,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -119,6 +122,7 @@ public class MainActivity extends Activity implements LocationListener {
     private int pick = -1;
     private boolean gnssRegistered, hasFix, drawerBuilt;
     private long lastGpsAt, lastNetAskAt, lastPosAt;
+    private boolean manualLoc; // the user typed a place; network positions are ignored until a GPS fix or "Automatik"
 
     // Widgets (recreated by rebuild)
     private SpeedometerView speedo;
@@ -184,6 +188,7 @@ public class MainActivity extends Activity implements LocationListener {
         wxAt = prefs.getLong("wxAt", 0);
         wxCode = prefs.getInt("wxCode", 0);
         wxPlace = prefs.getString("wxPlace", null);
+        manualLoc = prefs.getBoolean("manualLoc", false);
         // Only trust cached weather that was fetched for a real GPS position, not the default city.
         if (prefs.getBoolean("wxFix", false) && prefs.contains("wxTemp")) wxTemp = prefs.getInt("wxTemp", 0);
         raining = wxTemp != null && WeatherClient.isRain(wxCode) && System.currentTimeMillis() - wxAt < WEATHER_STALE_MS;
@@ -366,6 +371,8 @@ public class MainActivity extends Activity implements LocationListener {
         wx.setGravity(Gravity.CENTER_HORIZONTAL);
         locTv = text(1.9f, fgSoft(), 500);
         locTv.setGravity(Gravity.CENTER);
+        locTv.setPadding(px(1.5f), px(.4f), px(1.5f), px(.4f));
+        locTv.setOnClickListener(v -> askPlace()); // tap the place name to type your own place
         // Long-press the place name to hide or show it (handy for screenshots and videos).
         locTv.setOnLongClickListener(v -> {
             boolean now = !prefs.getBoolean("hidePlace", false);
@@ -926,7 +933,7 @@ public class MainActivity extends Activity implements LocationListener {
             wxTempTv.setText("--°C");
             wxCondTv.setText("Tiada data cuaca");
         }
-        String posAge = lastPosAt == 0 ? ""
+        String posAge = manualLoc ? "Lokasi ditetapkan sendiri" : lastPosAt == 0 ? ""
                 : "Lokasi dikemas kini " + new SimpleDateFormat("HH:mm", Locale.US).format(new Date(lastPosAt));
         wxHintTv.setText(!hasFix ? "Cuaca muncul selepas GPS dapat isyarat"
                 : internet ? posAge : "Sambung Wi-Fi atau hotspot untuk cuaca");
@@ -1014,6 +1021,7 @@ public class MainActivity extends Activity implements LocationListener {
      * so ask for a fresh one now and then (at most every 5 minutes, or at once when forced).
      */
     private void askNetworkFix(boolean force) {
+        if (manualLoc) return;
         if (android.os.Build.VERSION.SDK_INT < 30
                 || checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return;
         long now = android.os.SystemClock.elapsedRealtime();
@@ -1035,6 +1043,54 @@ public class MainActivity extends Activity implements LocationListener {
             } catch (SecurityException | IllegalArgumentException ignored) {
             }
         }, 4000);
+    }
+
+    private void askPlace() {
+        final EditText in = new EditText(this);
+        in.setSingleLine(true);
+        in.setHint("cth: Ipoh, Perak");
+        in.setInputType(InputType.TYPE_CLASS_TEXT);
+        new AlertDialog.Builder(this, AlertDialog.THEME_DEVICE_DEFAULT_DARK)
+                .setTitle("Tetapkan lokasi sendiri")
+                .setMessage(manualLoc ? "Sekarang: ditetapkan sendiri." : "Sekarang: automatik (rangkaian atau GPS).")
+                .setView(in)
+                .setPositiveButton("Tetapkan", (d, w) -> setManualPlace(in.getText().toString().trim()))
+                .setNeutralButton("Automatik", (d, w) -> {
+                    manualLoc = false;
+                    prefs.edit().putBoolean("manualLoc", false).apply();
+                    refreshNow();
+                })
+                .setNegativeButton("Batal", null)
+                .show();
+    }
+
+    private void setManualPlace(final String q) {
+        if (q.isEmpty()) return;
+        Toast.makeText(this, "Mencari " + q + "...", Toast.LENGTH_SHORT).show();
+        new Thread(() -> {
+            try {
+                final double[] c = WeatherClient.geocode(q);
+                runOnUiThread(() -> {
+                    if (c == null) {
+                        Toast.makeText(this, "Tempat tidak dijumpai di Malaysia", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    manualLoc = true;
+                    hasFix = true;
+                    lat = c[0];
+                    lng = c[1];
+                    lastPosAt = System.currentTimeMillis();
+                    wxAt = 0;
+                    prefs.edit().putBoolean("manualLoc", true)
+                            .putLong("lat", Double.doubleToLongBits(lat))
+                            .putLong("lng", Double.doubleToLongBits(lng)).apply();
+                    update();
+                    maybeFetchWeather();
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(this, "Gagal mencari. Ada internet?", Toast.LENGTH_LONG).show());
+            }
+        }).start();
     }
 
     /** Manual refresh: a fresh Wi-Fi scan, a fresh network position and fresh weather. */
@@ -1148,7 +1204,7 @@ public class MainActivity extends Activity implements LocationListener {
     public void onLocationChanged(Location l) {
         if (!LocationManager.GPS_PROVIDER.equals(l.getProvider())) {
             // Network position: only for place, weather and prayer times; never for speed, trip or the GPS log.
-            if (System.currentTimeMillis() - lastGpsAt > 120_000) {
+            if (!manualLoc && System.currentTimeMillis() - lastGpsAt > 120_000) {
                 // Compare with the saved position before overwriting it, otherwise a move never refreshes the weather.
                 boolean moved = !hasFix || Math.abs(l.getLatitude() - lat) > .05 || Math.abs(l.getLongitude() - lng) > .05;
                 useLocation(l);
@@ -1158,6 +1214,10 @@ public class MainActivity extends Activity implements LocationListener {
             return;
         }
         lastGpsAt = System.currentTimeMillis();
+        if (manualLoc) { // a real satellite fix beats a typed place
+            manualLoc = false;
+            prefs.edit().putBoolean("manualLoc", false).apply();
+        }
         gpsLog.record(l, satUsed);
         lastSpeed = l.hasSpeed() ? l.getSpeed() * 3.6f : 0f;
         speedo.setSpeed(lastSpeed);
