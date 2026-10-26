@@ -118,7 +118,7 @@ public class MainActivity extends Activity implements LocationListener {
     private final String[] tiles = new String[6];
     private int pick = -1;
     private boolean gnssRegistered, hasFix, drawerBuilt;
-    private long lastGpsAt, lastNetAskAt;
+    private long lastGpsAt, lastNetAskAt, lastPosAt;
 
     // Widgets (recreated by rebuild)
     private SpeedometerView speedo;
@@ -387,10 +387,7 @@ public class MainActivity extends Activity implements LocationListener {
         row.addView(wxCondTv);
         // Long-press the temperature to refresh the position and weather right now.
         row.setOnLongClickListener(v -> {
-            Toast.makeText(this, "Menyegarkan lokasi dan cuaca...", Toast.LENGTH_SHORT).show();
-            wxAt = 0;
-            askNetworkFix(true);
-            maybeFetchWeather();
+            refreshNow();
             return true;
         });
         LinearLayout.LayoutParams rl = lp(-2, -2, 0);
@@ -398,6 +395,9 @@ public class MainActivity extends Activity implements LocationListener {
         wx.addView(row, rl);
         wxHintTv = text(1.25f, accent(), 600);
         wxHintTv.setGravity(Gravity.CENTER);
+        wxHintTv.setPadding(px(1.5f), px(.6f), px(1.5f), px(.6f));
+        wxHintTv.setClickable(true);
+        wxHintTv.setOnClickListener(v -> refreshNow()); // tap "Lokasi dikemas kini ..." to refresh now
         LinearLayout.LayoutParams hl = lp(-2, -2, 0);
         hl.topMargin = px(.5f);
         wx.addView(wxHintTv, hl);
@@ -433,8 +433,8 @@ public class MainActivity extends Activity implements LocationListener {
         clockCol.setOrientation(LinearLayout.VERTICAL);
         LinearLayout clockRow = new LinearLayout(this);
         clockRow.setBaselineAligned(true);
-        clockTv = text(5.9f, fg(), 700);
-        ampmTv = text(1.8f, accent(), 700);
+        clockTv = text(5.6f, fg(), 700);
+        ampmTv = text(1.7f, accent(), 700);
         ampmTv.setLetterSpacing(.06f);
         ampmTv.setSingleLine(true);
         ampmTv.setMinWidth(px(3.6f));
@@ -926,8 +926,10 @@ public class MainActivity extends Activity implements LocationListener {
             wxTempTv.setText("--°C");
             wxCondTv.setText("Tiada data cuaca");
         }
+        String posAge = lastPosAt == 0 ? ""
+                : "Lokasi dikemas kini " + new SimpleDateFormat("HH:mm", Locale.US).format(new Date(lastPosAt));
         wxHintTv.setText(!hasFix ? "Cuaca muncul selepas GPS dapat isyarat"
-                : internet ? "" : "Sambung Wi-Fi atau hotspot untuk cuaca");
+                : internet ? posAge : "Sambung Wi-Fi atau hotspot untuk cuaca");
     }
 
     private static String agoText(long ms) {
@@ -1035,6 +1037,14 @@ public class MainActivity extends Activity implements LocationListener {
         }, 4000);
     }
 
+    /** Manual refresh: a fresh Wi-Fi scan, a fresh network position and fresh weather. */
+    private void refreshNow() {
+        wxHintTv.setText("Menyegarkan lokasi...");
+        wxAt = 0;
+        askNetworkFix(true);
+        handler.postDelayed(this::maybeFetchWeather, 5000);
+    }
+
     private void maybeFetchWeather() {
         if (!internet || fetching || !hasFix) return;
         long now = System.currentTimeMillis();
@@ -1113,6 +1123,7 @@ public class MainActivity extends Activity implements LocationListener {
 
     private void useLocation(Location l) {
         hasFix = true;
+        lastPosAt = System.currentTimeMillis();
         lat = l.getLatitude();
         lng = l.getLongitude();
         prefs.edit().putLong("lat", Double.doubleToLongBits(lat))
