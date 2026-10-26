@@ -42,7 +42,7 @@ Lagi latar: [pantai](docs/images/design/latar-pantai.jpg), [gunung](docs/images/
 - **Jam** tebal, mengikut tetapan 12/24 jam sistem, tarikh dalam Bahasa Melayu.
 - **Waktu solat** dikira dalam app (tanpa internet) menggunakan lokasi GPS: Subuh/Isyak 18°, Asar mazhab Syafie.
   Anggaran sahaja; rujuk JAKIM untuk waktu rasmi.
-- **Cuaca dan nama tempat** melalui Open-Meteo dan OpenStreetMap, dikemas kini setiap 30 minit bila ada internet. App juga meminta kedudukan rangkaian baharu setiap 5 minit
+- **Cuaca dan nama tempat** melalui Open-Meteo dan OpenStreetMap, dikemas kini setiap 10 minit bila ada internet. App juga meminta kedudukan rangkaian baharu setiap 2 minit
   (Android jarang menghantarnya sendiri bila disambung ke hotspot). **Ketik teks "Lokasi dikemas kini HH:mm"** di bawah cuaca (atau tahan lama suhu) untuk menyegarkan lokasi dan cuaca serta-merta.
   Tanpa GPS dan dengan hotspot, lokasi rangkaian boleh tersasar: **ketik nama tempat** (paling atas kiri) untuk menaip
   tempat sendiri (dicari melalui Nominatim, Malaysia sahaja). Ia kekal sehingga anda pilih "Automatik" atau GPS dapat
