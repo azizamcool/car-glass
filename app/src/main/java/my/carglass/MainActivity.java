@@ -75,7 +75,7 @@ public class MainActivity extends Activity implements LocationListener {
             "com.imotor.help", "com.ms.ms2160",
     };
     private static final double DEFAULT_LAT = 3.139, DEFAULT_LNG = 101.687; // Kuala Lumpur, until a GPS fix
-    private static final long WEATHER_EVERY_MS = 10 * 60_000L, WEATHER_STALE_MS = 3 * 3600_000L;
+    private static final long WEATHER_EVERY_MS = 15 * 60_000L, WEATHER_STALE_MS = 3 * 3600_000L;
 
     static {
         LABELS.put("com.imotor.fmam", "Radio");
