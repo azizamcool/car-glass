@@ -7,14 +7,14 @@
   Had 3 minit sekali rakam. Resolusi 1280x720 sudah mencukupi.
 - Pengait ujian (tanpa perlu memandu): 
   `adb shell am start -n my.carglass/.MainActivity --ef speed 112 --ef day 1 --ez rain true`
-  (`--ez splash true`, `--ez rain false`, `--ef day 0|1|-1`, `--ef speed N`).
+  (`--ez rain false`, `--ef day 0|1|-1`, `--ef speed N`).
 - Jangan rakam skrin kamera belakang atau lokasi rumah.
 
 ## Susunan syot
 
 | Masa | Syot | Cara |
 |---|---|---|
-| 0-3 s | Splash NEXUP | `--ez splash true` |
+| 0-3 s | Skrin utama malam, speedometer 0 | `--ef day 0 --ef speed 0` |
 | 3-9 s | Malam, speedometer naik 0 ke 146 | `--ef day 0` lalu `--ef speed` 0, 40, 80, 120, 146 |
 | 9-14 s | Peralihan siang, speedometer 112 | `--ef day 1 --ef speed 112` |
 | 14-19 s | Hujan malam | `--ez rain true --ef day 0` |

@@ -2,11 +2,11 @@
 
 | Unit | Android | Platform | RAM | Skrin | Keputusan |
 |---|---|---|---|---|---|
-| Mohawk (model `auto_rk_t10`), Perodua | 11 | RK3326 | 2 GB | 1280x720 | Berfungsi: pasang, Home lalai, splash, drawer, tukar app, tema, hujan, simulasi speedometer. Lihat di bawah |
+| Mohawk (model `auto_rk_t10`), Perodua | 11 | RK3326 | 2 GB | 1280x720 | Berfungsi: pasang, Home lalai, drawer, tukar app, tema, hujan, simulasi speedometer. Lihat di bawah |
 
 ## Apa yang telah disahkan pada unit Mohawk
 - Pemasangan melalui ADB wayarles, kebenaran lokasi, dan menjadi Home lalai (kekal selepas beberapa kitaran tidur dan bangun).
-- Splash NEXUP, skrin utama, senarai Semua apps, tahan lama untuk tukar app, penanda Wi-Fi (nama rangkaian).
+- Skrin utama, senarai Semua apps, tahan lama untuk tukar app, penanda Wi-Fi (nama rangkaian).
 - Tema siang/malam, efek hujan dan speedometer pada pelbagai kelajuan (dipaksa melalui pengait ujian ADB).
 
 ## Belum disahkan

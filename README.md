@@ -20,8 +20,8 @@ Tangkap skrin sebenar daripada unit (1280x720, Wi-Fi dan nama tempat disembunyik
 | ![Malam](docs/images/unit/malam.jpg) | ![Malam laju](docs/images/unit/malam-laju.jpg) | ![Hujan malam](docs/images/unit/hujan-malam.jpg) |
 | **Siang** | **Siang, laju** | **Tukar app (tahan lama)** |
 | ![Siang](docs/images/unit/siang.jpg) | ![Siang laju](docs/images/unit/siang-laju.jpg) | ![Tukar app](docs/images/unit/tukar-app.jpg) |
-| **Semua apps (malam)** | **Semua apps (siang)** | **Splash** |
-| ![Semua apps malam](docs/images/unit/senarai-apps-malam.jpg) | ![Semua apps siang](docs/images/unit/senarai-apps-siang.jpg) | ![Splash](docs/images/unit/splash-s1.jpg) |
+| **Semua apps (malam)** | **Semua apps (siang)** | |
+| ![Semua apps malam](docs/images/unit/senarai-apps-malam.jpg) | ![Semua apps siang](docs/images/unit/senarai-apps-siang.jpg) | |
 | **Kad media: YouTube** | **Kad media: tiada media** | |
 | ![Kad media YouTube](docs/images/unit/media-youtube-siang.jpg) | ![Kad media tiada](docs/images/unit/media-tiada-siang.jpg) | |
 
@@ -51,7 +51,6 @@ Lagi latar: [pantai](docs/images/design/latar-pantai.jpg), [gunung](docs/images/
 - **Enam app** di skrin utama. **Tahan lama** untuk tukar; **Semua apps** untuk senarai penuh. Ikon diambil terus daripada app.
 - **Kaca berkabur** (kabur dibuat daripada latar kerana Android 11 tiada kabur langsung) dan ikon tanpa petak latar.
 - **Siang / malam** dengan pudar sekitar Syuruk dan Maghrib; **hujan** bila cuaca menunjukkan hujan.
-- **Splash** pendek (sekitar 1.3 saat) bila app dimulakan atau unit bangun.
 - **Kad media** di bawah speedometer: tajuk, artis, kulit album, bar kemajuan dan butang sebelumnya/main/seterusnya
   untuk YouTube Music, YouTube dan Bluetooth muzik. Bila tiada media, kad menunjukkan pintasan YouTube Music, Radio
   dan BT. Perlu *Notification access* untuk Car Glass (sekali sahaja): Tetapan, atau
@@ -73,7 +72,6 @@ untuk unit 2 GB RAM.
 | `BackgroundView`, `GlassDrawable` | Latar dan kaca: kabur dibuat lebih awal daripada latar (Android 11 tiada kabur langsung) |
 | `MediaCard`, `MediaWatcher`, `MediaAccess` | Kad media: ikut sesi media yang aktif (MediaSession), lukis kad dan butang; `MediaAccess` ialah pendengar notifikasi kosong yang diperlukan Android untuk akses itu |
 | `RainView` | Efek titisan hujan |
-| `SplashView` | Splash NEXUP sekitar 1.3 saat |
 | `PrayerTimes` | Waktu solat dikira dalam app (Subuh/Isyak 18°, Asar mazhab Syafie), tanpa internet |
 | `WeatherClient` | Cuaca (Open-Meteo) dan nama tempat (Nominatim) |
 | `Icons`, `Fonts` | Ikon app asal (adaptive icon) dan Exo 2 |
@@ -148,7 +146,7 @@ Keperluan: JDK 17 dan Android SDK (platform 34, build-tools 34). Lihat [docs/DEV
 
 ## Kredit dan lesen
 
-- Kod: MIT (lihat [LICENSE](LICENSE)). Nama dan logo NEXUP dalam splash ialah jenama pemilik dan tidak termasuk dalam lesen.
+- Kod: MIT (lihat [LICENSE](LICENSE)). Sebarang nama atau logo jenama pihak ketiga dalam kod atau gambar ialah milik pemiliknya dan tidak termasuk dalam lesen.
 - Font **Exo 2**: SIL Open Font License 1.1 ([licenses/OFL-Exo2.txt](licenses/OFL-Exo2.txt)).
 - Ikon duotone Radio, Bluetooth, Muzik, Navigasi, Video, Carlink, Fail, Galeri dan Tetapan: [Phosphor Icons](https://phosphoricons.com), MIT ([licenses/PHOSPHOR-LICENSE.txt](licenses/PHOSPHOR-LICENSE.txt)).
 - Cuaca: [Open-Meteo](https://open-meteo.com) (penggunaan bukan komersial, dengan atribusi).

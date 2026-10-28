@@ -96,7 +96,7 @@ Beri pengguna: cara kembali ke Home asal (`tools/revert.ps1`), cara tukar enam a
 
 - Projek Android (Java, tanpa pustaka luar): `app/`. Reka bentuk web untuk pratonton: `design/home.html`.
 - Padankan gaya kod sedia ada. Ukuran UI dalam unit "cq" (`lebar skrin / 100`), bukan dp tetap.
-- Pengait ujian ADB dalam `MainActivity.onNewIntent`: `--ez splash true`, `--ez rain true|false`,
+- Pengait ujian ADB dalam `MainActivity.onNewIntent`: `--ez rain true|false`,
   `--ef day 0|1` (-1 untuk kosongkan), `--ef speed N`, `--es media play|idle|off` (pemain palsu untuk tangkap skrin).
 - Kad media perlu *Notification access*. Berikan hanya dengan persetujuan pengguna (`tools/install.ps1 -MediaAccess`);
   tarik balik dengan `cmd notification disallow_listener my.carglass/my.carglass.MediaAccess`. Lihat [docs/DEVELOPING.md](docs/DEVELOPING.md).

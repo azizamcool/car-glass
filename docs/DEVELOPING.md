@@ -17,7 +17,6 @@
 | `SpeedometerView.java` | Gauge bersegmen dan nombor kelajuan |
 | `BackgroundView.java` | Latar jalan malam dan siang (pudar mengikut `dayFactor`), kelabu bila hujan |
 | `RainView.java` | Efek hujan (~30 fps, hanya bila kelihatan) |
-| `SplashView.java` | Animasi logo, ~1.3 saat |
 | `PrayerTimes.java` | Waktu solat luar talian |
 | `WeatherClient.java` | Open-Meteo dan Nominatim (jalankan di luar thread utama) |
 | `Fonts.java` | Memuatkan Exo 2 (font boleh ubah) dari `assets/fonts` |
@@ -29,7 +28,6 @@ Unit ukuran UI ialah `cq` = lebar skrin / 100, supaya susun atur skala pada reso
 `MainActivity` menerima parameter melalui `am start` (app mesti sudah berjalan):
 
 ```powershell
-adb shell am start -n my.carglass/.MainActivity --ez splash true     # mainkan splash
 adb shell am start -n my.carglass/.MainActivity --ez rain true       # hujan (false untuk matikan)
 adb shell am start -n my.carglass/.MainActivity --ef day 1           # paksa siang (0 malam, -1 normal)
 adb shell am start -n my.carglass/.MainActivity --ef speed 95        # paparkan kelajuan 95
