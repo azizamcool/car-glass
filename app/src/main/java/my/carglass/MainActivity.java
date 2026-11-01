@@ -1230,6 +1230,18 @@ public class MainActivity extends Activity implements LocationListener {
         }
     }
 
+    // On Android 9 (API 28) these three are still abstract methods of LocationListener; they only
+    // became default methods in API 30. Compiling against API 34 hides that, and the framework
+    // then throws AbstractMethodError when it calls them at runtime.
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) { }
+
+    @Override
+    public void onProviderEnabled(String provider) { }
+
+    @Override
+    public void onProviderDisabled(String provider) { }
+
     @Override
     protected void onNewIntent(Intent i) {
         super.onNewIntent(i);
