@@ -45,6 +45,8 @@ if ($Apply) {
         }
     }
     foreach ($p in $disable) {
+        $on = (Invoke-Adb $Device @('shell', 'pm', 'list', 'packages', '-e', $p)) -contains "package:$p"
+        if (-not $on) { Write-Host ("{0,-46} {1}" -f $p, 'tidak aktif/tiada, dilangkau'); continue }
         $r = (Invoke-Adb $Device @('shell', 'pm', 'disable-user', '--user', '0', $p)) -join ' '
         Write-Host ("{0,-46} {1}" -f $p, $r)
     }
@@ -56,6 +58,8 @@ if ($Apply) {
 Invoke-Adb $Device @('shell', 'settings', 'delete', 'global', 'animator_duration_scale') | Out-Null
 foreach ($p in $limitBackground) { Invoke-Adb $Device @('shell', 'cmd', 'appops', 'reset', $p) | Out-Null }
 foreach ($p in $disable) {
+    $installed = (Invoke-Adb $Device @('shell', 'pm', 'list', 'packages', $p)) -contains "package:$p"
+    if (-not $installed) { Write-Host ("{0,-46} {1}" -f $p, 'tiada, dilangkau'); continue }
     $r = (Invoke-Adb $Device @('shell', 'pm', 'enable', '--user', '0', $p)) -join ' '
     Write-Host ("{0,-46} {1}" -f $p, $r)
 }

@@ -16,12 +16,24 @@ function Get-Adb {
 }
 
 # Runs adb (optionally against one device) and returns the output lines.
+# adb writes expected failures (an unknown package, a refused disable) to stderr. With
+# $ErrorActionPreference = 'Stop' that would end the script on the first such line, so the
+# preference is relaxed for the call and restored afterwards.
 function Invoke-Adb {
     param([string]$Device, [string[]]$AdbArgs)
     $adb = Get-Adb
     if ($Device) { $AdbArgs = @('-s', $Device) + $AdbArgs }
-    $out = & $adb @AdbArgs 2>&1
-    return @($out | ForEach-Object { "$_" })
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $out = & $adb @AdbArgs 2>&1
+    } finally {
+        $ErrorActionPreference = $previous
+    }
+    # stderr arrives as ErrorRecord objects; keep the message, not the type name in front of it.
+    return @($out | ForEach-Object {
+        if ($_ -is [System.Management.Automation.ErrorRecord]) { $_.Exception.Message } else { "$_" }
+    })
 }
 
 function Get-Prop {
